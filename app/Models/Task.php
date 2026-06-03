@@ -12,6 +12,9 @@ class Task extends Model
     protected $fillable = [
         'user_id',
         'title',
+        'description',
+        'coin_reward',
+        'task_type',
         'is_routine',
         'is_checked',
     ];
@@ -19,6 +22,7 @@ class Task extends Model
     protected $casts = [
         'is_routine' => 'boolean',
         'is_checked' => 'boolean',
+        'coin_reward' => 'integer',
     ];
 
     public function user() { 
