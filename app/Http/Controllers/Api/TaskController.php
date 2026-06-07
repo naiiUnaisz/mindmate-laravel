@@ -27,7 +27,10 @@ class TaskController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'is_routine' => 'boolean'
+            'is_routine' => 'boolean',
+            'description' => 'nullable|string',
+            'coin_reward' => 'nullable|integer', 
+            'task_type' => 'nullable|string'
         ]);
 
         $task = $request->user()->tasks()->create($validated);
@@ -52,7 +55,8 @@ class TaskController extends Controller
         $validated = $request->validate([
             'title' => 'string|max:255',
             'is_routine' => 'boolean',
-            'is_checked' => 'boolean'
+            'is_checked' => 'boolean',
+            'description' => 'nullable|string',
         ]);
 
         $task->update($validated);
@@ -117,7 +121,7 @@ class TaskController extends Controller
         // 3. LOGIKA POINT BERDASARKAN HALAMAN ASAL (KERANJANG vs PUZZLE)
         if ($source === 'puzzle') {
             // TUGAS UTAMA (Dari Halaman Puzzle)
-            $rewardAmount = 15;
+            $rewardAmount = $task->coin_reward;
 
             // Buka kepingan puzzle (Maksimal 6)
             if ($currentPieces < 6) {
@@ -141,7 +145,7 @@ class TaskController extends Controller
             }
         } else {
             // TUGAS KERANJANG (Dari Master To-Do List)
-            $rewardAmount = 5;
+            $rewardAmount = $task->coin_reward ;
             
             // Opsional: Jika tugas keranjang diceklis, ubah status is_checked di master task
             $task->update(['is_checked' => true]); 
