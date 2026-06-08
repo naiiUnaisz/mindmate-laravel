@@ -45,12 +45,9 @@ class TaskController extends Controller
 
 
     // 3. Update tugas (Bisa untuk edit judul atau mencoret is_checked)
-    public function update(Request $request, Task $task)
+    public function update(Request $request, $id)
     {
-        // Pastikan tugas ini emang milik user yang request
-        if ($task->user_id !== $request->user()->id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        $task = $request->user()->tasks()->findOrFail($id);
 
         $validated = $request->validate([
             'title' => 'string|max:255',
@@ -69,11 +66,9 @@ class TaskController extends Controller
     }
 
     // 4. Hapus tugas (Soft Delete)
-    public function destroy(Request $request, Task $task)
+    public function destroy(Request $request, $id)
     {
-        if ($task->user_id !== $request->user()->id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        $task = $request->user()->tasks()->findOrFail($id);
 
         $task->delete();
 
