@@ -9,6 +9,7 @@ class App extends Model
     protected $fillable = [
         'name',
         'title',
+        'category',
         'url',
         'coin_cost',
         'duration_minutes',

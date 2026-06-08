@@ -3,27 +3,56 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreMoodRequest;
+use App\Http\Resources\DailyRecordResource;
 use App\Models\DailyRecord;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class DailyRecordController extends Controller
 {
-    public function storeMood(Request $request){
-        $request->validate([
-            'mood_level' => 'required|in:good,neutral,bad',
-        ]);
-
+    public function show(Request $request)
+    {
         $user = $request->user();
         $today = Carbon::today()->toDateString();
 
-        // mencari data hari ini, jika belum ada otomatis dibuatkan record baru
+        $dailyRecord = DailyRecord::with([
+            'dailyTaskItems.task',
+            'puzzlePieces'
+        ])->where('user_id', $user->id)
+          ->where('date', $today)
+          ->first();
+
+        if (!$dailyRecord) {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'date' => $today,
+                    'mood_level' => null,
+                    'is_rest_day' => false,
+                    'puzzle_completed_count' => 0,
+                    'daily_task_items' => [],
+                    'puzzle_pieces' => [],
+                ]
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => new DailyRecordResource($dailyRecord)
+        ]);
+    }
+
+    public function storeMood(StoreMoodRequest $request)
+    {
+        $user = $request->user();
+        $today = Carbon::today()->toDateString();
+
         $dailyRecord = DailyRecord::firstOrCreate(
             ['user_id' => $user->id, 'date' => $today],
             ['mood_level' => 'neutral', 'is_rest_day' => false, 'puzzle_completed_count' => 0]
         );
 
-        // Update level mood sesuai yang ditekan user di Flutter
         $dailyRecord->update([
             'mood_level' => $request->mood_level
         ]);
@@ -38,19 +67,16 @@ class DailyRecordController extends Controller
         ]);
     }
 
-    // logika rest day
     public function useRestDay(Request $request)
     {
         $user = $request->user();
         $today = Carbon::today()->toDateString();
 
-        // 1. Cari atau buat record harian untuk hari ini
         $dailyRecord = DailyRecord::firstOrCreate(
             ['user_id' => $user->id, 'date' => $today],
             ['mood_level' => 'neutral', 'is_rest_day' => false, 'puzzle_completed_count' => 0]
         );
 
-        // 2. Cegah jika user mencoba mengaktifkan Rest Day ganda di hari yang sama
         if ($dailyRecord->is_rest_day) {
             return response()->json([
                 'success' => false,
@@ -58,7 +84,6 @@ class DailyRecordController extends Controller
             ], 400);
         }
 
-        // 3. Cek apakah kuota Rest Day milik user di tabel users masih tersedia
         if ($user->restday_quota <= 0) {
             return response()->json([
                 'success' => false,
@@ -66,7 +91,6 @@ class DailyRecordController extends Controller
             ], 400);
         }
 
-        // 4. Potong kuota cuti user sebanyak 1, dan set status hari ini jadi TRUE
         $user->decrement('restday_quota');
         $dailyRecord->update(['is_rest_day' => true]);
 
@@ -80,4 +104,3 @@ class DailyRecordController extends Controller
         ]);
     }
 }
-    

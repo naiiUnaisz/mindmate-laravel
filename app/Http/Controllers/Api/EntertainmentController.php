@@ -35,8 +35,8 @@ class EntertainmentController extends Controller
             ->whereDate('created_at', Carbon::today())
             ->count();
 
-        // Rumus kenaikan harga: Harga asli dikali 2 pangkat jumlah pembelian hari ini
-        $actualCoinCost = $app->coin_cost * pow(2, $purchaseCountToday);
+        // Rumus kenaikan harga: BasePrice * 1.5^(jumlah beli - 1)
+        $actualCoinCost = (int)($app->coin_cost * pow(1.5, $purchaseCountToday));
 
         // Mengecek apakah koin user cukup dengan harga yang sudah inflasi
         if ($user->coin_balance < $actualCoinCost) {
@@ -117,21 +117,28 @@ class EntertainmentController extends Controller
         $now = now();
         $expiredAt = Carbon::parse($activeSession->expired_at);
 
-        // Cek apakah user telat absen (lewat dari waktu expired)
         if ($now->gt($expiredAt)) {
-            // Hitung menit keterlambatan
             $minutesLate = $now->diffInMinutes($expiredAt);
-            
-            // Aturan denda: misal 5 koin per menit telat
-            $fineAmount = $minutesLate * 5; 
 
-            // Potong saldo koin user 
+            if ($minutesLate == 0) {
+                $activeSession->update(['status' => 'absen_success']);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Kamu baru telat beberapa detik, masih kami anggap tepat waktu. Sesi bermain ditutup.',
+                    'data' => [
+                        'status' => 'absen_success',
+                        'current_coin_balance' => $user->coin_balance
+                    ]
+                ]);
+            }
+
+            $fineAmount = $minutesLate * 5;
+
             $user->decrement('coin_balance', $fineAmount);
 
-            // Ubah status log jadi kena denda
             $activeSession->update(['status' => 'fined']);
 
-            // Catat ke tabel Punishments
             $punishment = Punishment::create([
                 'user_id' => $user->id,
                 'entertainment_log_id' => $activeSession->id,
@@ -139,7 +146,6 @@ class EntertainmentController extends Controller
                 'reason' => "Telat absen bermain selama {$minutesLate} menit.",
             ]);
 
-            // Catat pengeluaran denda ke CoinHistori
             CoinHistories::create([
                 'user_id' => $user->id,
                 'amount' => $fineAmount,
@@ -159,7 +165,6 @@ class EntertainmentController extends Controller
             ]);
         }
 
-        // JIKA TEPAT WAKTU (Aman)
         $activeSession->update(['status' => 'absen_success']);
 
         return response()->json([

@@ -10,6 +10,8 @@ class EntertainmentLog extends Model
         'user_id',
         'app_id',
         'status',
+        'started_at',
+        'expired_at',
     ];
 
     public function user() { 

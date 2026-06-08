@@ -2,6 +2,23 @@
 
 **Base URL:** `https://unaisah-digitallab.my.id/api`
 
+**Format Response Umum:**
+```json
+{
+    "success": true,
+    "data": { ... },
+    "message": "..."
+}
+```
+
+Semua error response mengembalikan:
+```json
+{
+    "success": false,
+    "message": "Pesan error"
+}
+```
+
 ---
 
 ## 1. Public Endpoints (Tanpa Token)
@@ -27,12 +44,15 @@ POST /register
 **Response** `201 Created`
 ```json
 {
+    "success": true,
     "access_token": "1|abc123def456...",
     "user": {
         "id": 1,
         "name": "John Doe",
         "email": "john@example.com",
-        "email_verified_at": null,
+        "coin_balance": 0,
+        "current_streak": 0,
+        "restday_quota": 2,
         "created_at": "2026-06-08T10:00:00.000000Z",
         "updated_at": "2026-06-08T10:00:00.000000Z"
     }
@@ -48,6 +68,8 @@ POST /register
     }
 }
 ```
+
+---
 
 ### 1.2 Login
 
@@ -69,30 +91,26 @@ POST /login
 **Response** `200 OK`
 ```json
 {
+    "success": true,
     "access_token": "2|xyz789abc...",
     "user": {
         "id": 1,
         "name": "John Doe",
         "email": "john@example.com",
+        "coin_balance": 50,
+        "current_streak": 3,
+        "restday_quota": 2,
         "created_at": "2026-06-08T10:00:00.000000Z",
-        "updated_at": "2026-06-08T10:00:00.000000Z"
+        "updated_at": "2026-06-08T12:00:00.000000Z"
     }
 }
 ```
 
-**Error Response** `404 Not Found`
+**Error Response** `401 Unauthorized`
 ```json
 {
-    "status": "error",
-    "message": "Email not found"
-}
-```
-
-**Error Response** (password salah)
-```json
-{
-    "status": "error",
-    "message": "password is not match"
+    "success": false,
+    "message": "Email atau password salah"
 }
 ```
 
@@ -127,18 +145,42 @@ GET /tasks
             "title": "Belajar Laravel",
             "description": "Membaca dokumentasi routes",
             "coin_reward": 10,
-            "task_type": null,
+            "task_type": "belajar",
             "is_routine": false,
             "is_checked": false,
             "created_at": "2026-06-08T10:00:00.000000Z",
-            "updated_at": "2026-06-08T10:00:00.000000Z",
-            "deleted_at": null
+            "updated_at": "2026-06-08T10:00:00.000000Z"
         }
     ]
 }
 ```
 
-#### 2.1.2 Tambah Tugas
+#### 2.1.2 Lihat Detail Tugas
+
+```
+GET /tasks/{id}
+```
+
+**Response** `200 OK`
+```json
+{
+    "success": true,
+    "data": {
+        "id": 1,
+        "user_id": 1,
+        "title": "Belajar Laravel",
+        "description": "Membaca dokumentasi routes",
+        "coin_reward": 10,
+        "task_type": "belajar",
+        "is_routine": false,
+        "is_checked": false,
+        "created_at": "2026-06-08T10:00:00.000000Z",
+        "updated_at": "2026-06-08T10:00:00.000000Z"
+    }
+}
+```
+
+#### 2.1.3 Tambah Tugas
 
 ```
 POST /tasks
@@ -155,36 +197,19 @@ POST /tasks
 }
 ```
 
+| Parameter | Tipe | Required | Default | Keterangan |
+|---|---|---|---|---|
+| `title` | string | Ya | - | Judul tugas |
+| `description` | string | Tidak | null | Deskripsi tugas |
+| `is_routine` | boolean | Tidak | false | Apakah tugas rutin |
+| `coin_reward` | integer | Tidak | 10 | Koin yang didapat saat checklist |
+| `task_type` | string | Tidak | null | Kategori tugas |
+
 **Response** `201 Created`
 ```json
 {
     "success": true,
     "message": "Tugas berhasil ditambahkan",
-    "data": {
-        "id": 1,
-        "user_id": 1,
-        "title": "Belajar Laravel",
-        "description": "Membaca dokumentasi routes",
-        "coin_reward": 10,
-        "task_type": "belajar",
-        "is_routine": false,
-        "is_checked": false,
-        "created_at": "2026-06-08T10:00:00.000000Z",
-        "updated_at": "2026-06-08T10:00:00.000000Z"
-    }
-}
-```
-
-#### 2.1.3 Lihat Detail Tugas
-
-```
-GET /tasks/{id}
-```
-
-**Response** `200 OK`
-```json
-{
-    "success": true,
     "data": {
         "id": 1,
         "user_id": 1,
@@ -212,9 +237,13 @@ PUT /tasks/{id}
     "title": "Belajar Laravel Lanjutan",
     "description": "Membaca dokumentasi Eloquent",
     "is_checked": true,
-    "is_routine": true
+    "is_routine": true,
+    "coin_reward": 15,
+    "task_type": "belajar"
 }
 ```
+
+Semua parameter bersifat opsional.
 
 **Response** `200 OK`
 ```json
@@ -226,7 +255,7 @@ PUT /tasks/{id}
         "user_id": 1,
         "title": "Belajar Laravel Lanjutan",
         "description": "Membaca dokumentasi Eloquent",
-        "coin_reward": 10,
+        "coin_reward": 15,
         "task_type": "belajar",
         "is_routine": true,
         "is_checked": true,
@@ -236,10 +265,10 @@ PUT /tasks/{id}
 }
 ```
 
-**Error Response** `403 Forbidden` (bukan pemilik tugas)
+**Error Response** `404 Not Found` (bukan pemilik tugas / tidak ditemukan)
 ```json
 {
-    "message": "Unauthorized"
+    "message": "No query results for model [App\\Models\\Task] 1"
 }
 ```
 
@@ -272,11 +301,20 @@ Menandai tugas selesai untuk hari ini. Koin otomatis ditambahkan, dan potongan p
 }
 ```
 
-| Parameter | Tipe   | Default | Keterangan                                                    |
-|-----------|--------|---------|---------------------------------------------------------------|
-| `source`  | string | `"cart"`| Asal checklist: `"cart"` (To-Do List) atau `"puzzle"` (Puzzle) |
+| Parameter | Tipe | Default | Keterangan |
+|---|---|---|---|
+| `source` | string | `"cart"` | Asal checklist: `"cart"` (To-Do List) atau `"puzzle"` (Halaman Puzzle) |
 
-**Response** `200 OK`
+**Logic Penting:**
+- Jika `source = "puzzle"`:
+  - Membuka 1 piece puzzle (maksimal 6 per hari)
+  - Jika puzzle mencapai 6/6: bonus **+100 coin** + streak bertambah
+  - Jika puzzle sudah penuh (6/6): tidak ada reward (tidak membuka piece baru)
+- Jika `source = "cart"`:
+  - Mendapatkan `coin_reward` dari task
+  - Task ditandai `is_checked = true`
+
+**Response** `200 OK` (cart)
 ```json
 {
     "success": true,
@@ -292,18 +330,190 @@ Menandai tugas selesai untuk hari ini. Koin otomatis ditambahkan, dan potongan p
 }
 ```
 
+**Response** `200 OK` (puzzle — buka piece)
+```json
+{
+    "success": true,
+    "message": "Tugas berhasil diselesaikan!",
+    "data": {
+        "source": "puzzle",
+        "puzzle_opened": true,
+        "current_puzzle_count": 3,
+        "coins_earned": 10,
+        "current_coin_balance": 60,
+        "current_streak": 0
+    }
+}
+```
+
+**Response** `200 OK` (puzzle — full puzzle + bonus)
+```json
+{
+    "success": true,
+    "message": "Tugas berhasil diselesaikan!",
+    "data": {
+        "source": "puzzle",
+        "puzzle_opened": true,
+        "current_puzzle_count": 6,
+        "coins_earned": 110,
+        "current_coin_balance": 170,
+        "current_streak": 1
+    }
+}
+```
+
 **Error Response** `400 Bad Request` (tugas sudah diceklis hari ini)
 ```json
 {
+    "success": false,
     "message": "Tugas ini sudah diselesaikan hari ini."
 }
 ```
 
 ---
 
-### 2.2 Fitur Hiburan (Relax)
+### 2.2 Fitur Daily Record (Puzzle, Mood, Rest Day)
 
-#### 2.2.1 Daftar Aplikasi Hiburan
+#### 2.2.1 Lihat Daily Record Hari Ini
+
+```
+GET /daily-record
+```
+
+Mengembalikan data record harian termasuk mood, status rest day, progress puzzle, dan task yang sudah dikerjakan hari ini.
+
+**Response** `200 OK` (sudah ada aktivitas hari ini)
+```json
+{
+    "success": true,
+    "data": {
+        "id": 1,
+        "user_id": 1,
+        "date": "2026-06-08",
+        "mood_level": "good",
+        "is_rest_day": false,
+        "puzzle_completed_count": 3,
+        "daily_task_items": [
+            {
+                "id": 1,
+                "daily_record_id": 1,
+                "task_id": 1,
+                "is_completed": true,
+                "task": {
+                    "id": 1,
+                    "user_id": 1,
+                    "title": "Belajar Laravel",
+                    "description": null,
+                    "coin_reward": 10,
+                    "task_type": null,
+                    "is_routine": false,
+                    "is_checked": false,
+                    "created_at": "2026-06-08T10:00:00.000000Z",
+                    "updated_at": "2026-06-08T10:00:00.000000Z"
+                },
+                "created_at": "2026-06-08T10:00:00.000000Z",
+                "updated_at": "2026-06-08T10:00:00.000000Z"
+            }
+        ],
+        "puzzle_pieces": [
+            {
+                "id": 1,
+                "daily_record_id": 1,
+                "daily_task_item_id": 1,
+                "piece_number": 1,
+                "is_opened": true,
+                "opened_at": "2026-06-08T10:00:00.000000Z",
+                "created_at": "2026-06-08T10:00:00.000000Z",
+                "updated_at": "2026-06-08T10:00:00.000000Z"
+            }
+        ],
+        "created_at": "2026-06-08T10:00:00.000000Z",
+        "updated_at": "2026-06-08T10:00:00.000000Z"
+    }
+}
+```
+
+**Response** `200 OK` (belum ada aktivitas hari ini)
+```json
+{
+    "success": true,
+    "data": {
+        "date": "2026-06-08",
+        "mood_level": null,
+        "is_rest_day": false,
+        "puzzle_completed_count": 0,
+        "daily_task_items": [],
+        "puzzle_pieces": []
+    }
+}
+```
+
+#### 2.2.2 Catat Mood Harian
+
+```
+POST /daily-record/mood
+```
+
+**Request Body**
+```json
+{
+    "mood_level": "good"
+}
+```
+
+Nilai `mood_level` yang valid: `"good"`, `"neutral"`, `"bad"`.
+
+**Response** `200 OK`
+```json
+{
+    "success": true,
+    "message": "Mood kamu hari ini berhasil dicatat!",
+    "data": {
+        "date": "2026-06-08",
+        "mood_level": "good"
+    }
+}
+```
+
+#### 2.2.3 Gunakan Rest Day
+
+```
+POST /daily-record/rest-day
+```
+
+**Response** `200 OK`
+```json
+{
+    "success": true,
+    "message": "Rest Day berhasil diaktifkan! Nikmati waktu istirahatmu hari ini.",
+    "data": {
+        "current_restday_quota": 1,
+        "is_rest_day": true
+    }
+}
+```
+
+**Error Response** `400 Bad Request` (rest day sudah dipakai hari ini)
+```json
+{
+    "success": false,
+    "message": "Kamu sudah mengambil jatah Rest Day untuk hari ini."
+}
+```
+
+**Error Response** `400 Bad Request` (kuota habis)
+```json
+{
+    "success": false,
+    "message": "Kuota Rest Day kamu sudah habis! Tetap semangat kerjakan tugas ya."
+}
+```
+
+---
+
+### 2.3 Fitur Hiburan (Relax)
+
+#### 2.3.1 Daftar Aplikasi Hiburan
 
 ```
 GET /apps
@@ -318,6 +528,7 @@ GET /apps
             "id": 1,
             "name": "youtube",
             "title": "YouTube",
+            "category": "movie",
             "url": "https://youtube.com",
             "coin_cost": 30,
             "duration_minutes": 30,
@@ -328,11 +539,16 @@ GET /apps
 }
 ```
 
-#### 2.2.2 Beli Sesi Hiburan
+#### 2.3.2 Beli Sesi Hiburan
 
 ```
 POST /apps/{id}/purchase
 ```
+
+**Logic:**
+- Harga mengalami **inflasi** setiap pembelian di hari yang sama: `harga_asli × 2^jumlah_pembelian_hari_ini`
+- Hanya bisa 1 sesi aktif dalam satu waktu
+- Sesi otomatis memiliki `expired_at` = waktu sekarang + durasi menit
 
 **Response** `200 OK`
 ```json
@@ -366,13 +582,21 @@ POST /apps/{id}/purchase
 }
 ```
 
-#### 2.2.3 Selesaikan / Absen Sesi Hiburan
+#### 2.3.3 Selesaikan / Absen Sesi Hiburan
 
 ```
 POST /apps/complete
 ```
 
-**Response** `200 OK` (tepat waktu)
+**Logic Denda:**
+- Jika waktu sekarang **melebihi** `expired_at`:
+  - Grace period < 1 menit: dianggap **tepat waktu** (tidak kena denda, status `absen_success`)
+  - Jika telat ≥ 1 menit: denda = **menit telat × 5 coin** (status `fined`)
+- Jika **tepat waktu / lebih awal**: status `absen_success`, tanpa denda
+
+> Catatan: Saldo koin bisa menjadi **minus** jika jumlah denda melebihi saldo yang dimiliki.
+
+**Response** `200 OK` (tepat waktu / grace period)
 ```json
 {
     "success": true,
@@ -392,7 +616,7 @@ POST /apps/complete
     "data": {
         "status": "fined",
         "fine_amount": 25,
-        "current_coin_balance": 75
+        "current_coin_balance": -5
     }
 }
 ```
@@ -405,7 +629,9 @@ POST /apps/complete
 }
 ```
 
-#### 2.2.4 Riwayat Koin
+---
+
+### 2.4 Riwayat Koin
 
 ```
 GET /coin-histori
@@ -444,74 +670,9 @@ GET /coin-histori
 
 ---
 
-### 2.3 Fitur Mood & Rest Day
+### 2.5 Fitur Profil & Logout
 
-#### 2.3.1 Catat Mood Harian
-
-```
-POST /daily-record/mood
-```
-
-**Request Body**
-```json
-{
-    "mood_level": "good"
-}
-```
-
-Nilai `mood_level` yang valid: `"good"`, `"neutral"`, `"bad"`.
-
-**Response** `200 OK`
-```json
-{
-    "success": true,
-    "message": "Mood kamu hari ini berhasil dicatat!",
-    "data": {
-        "date": "2026-06-08",
-        "mood_level": "good"
-    }
-}
-```
-
-#### 2.3.2 Gunakan Rest Day
-
-```
-POST /daily-record/rest-day
-```
-
-**Response** `200 OK`
-```json
-{
-    "success": true,
-    "message": "Rest Day berhasil diaktifkan! Nikmati waktu istirahatmu hari ini.",
-    "data": {
-        "current_restday_quota": 2,
-        "is_rest_day": true
-    }
-}
-```
-
-**Error Response** `400 Bad Request` (rest day sudah dipakai hari ini)
-```json
-{
-    "success": false,
-    "message": "Kamu sudah mengambil jatah Rest Day untuk hari ini."
-}
-```
-
-**Error Response** `400 Bad Request` (kuota habis)
-```json
-{
-    "success": false,
-    "message": "Kuota Rest Day kamu sudah habis! Tetap semangat kerjakan tugas ya."
-}
-```
-
----
-
-### 2.4 Fitur Profil & Logout
-
-#### 2.4.1 Profil User
+#### 2.5.1 Profil User
 
 ```
 GET /user/profile
@@ -534,7 +695,7 @@ GET /user/profile
 }
 ```
 
-#### 2.4.2 Logout
+#### 2.5.2 Logout
 
 Hapus token akses yang sedang digunakan.
 
@@ -545,7 +706,31 @@ POST /logout
 **Response** `200 OK`
 ```json
 {
-    "status": "success",
+    "success": true,
     "message": "Logout successfully"
 }
 ```
+
+---
+
+## 3. Ringkasan Endpoint
+
+| Method | Endpoint | Auth | Fungsi |
+|---|---|---|---|
+| POST | `/register` | - | Register akun baru |
+| POST | `/login` | - | Login & dapatkan token |
+| POST | `/logout` | Sanctum | Hapus token |
+| GET | `/tasks` | Sanctum | Lihat semua tugas |
+| GET | `/tasks/{id}` | Sanctum | Lihat detail tugas |
+| POST | `/tasks` | Sanctum | Tambah tugas baru |
+| PUT | `/tasks/{id}` | Sanctum | Update tugas |
+| DELETE | `/tasks/{id}` | Sanctum | Hapus tugas (soft delete) |
+| POST | `/tasks/{id}/check` | Sanctum | Checklist tugas harian |
+| GET | `/apps` | Sanctum | Daftar aplikasi hiburan |
+| POST | `/apps/{id}/purchase` | Sanctum | Beli sesi hiburan |
+| POST | `/apps/complete` | Sanctum | Absen selesai hiburan |
+| GET | `/coin-histori` | Sanctum | Riwayat koin |
+| GET | `/daily-record` | Sanctum | Daily record hari ini |
+| POST | `/daily-record/mood` | Sanctum | Catat mood harian |
+| POST | `/daily-record/rest-day` | Sanctum | Gunakan rest day |
+| GET | `/user/profile` | Sanctum | Profil user |

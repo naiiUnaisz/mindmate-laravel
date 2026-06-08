@@ -15,22 +15,21 @@ Route::get('/user', function (Request $request) {
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout'])-> middleware('auth:sanctum');
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
 Route::middleware('auth:sanctum')->group(function() {
 
     Route::apiResource('/tasks', TaskController::class);
     Route::post('/tasks/{id}/check', [TaskController::class, 'checkTask']);
 
-    // 3. Rute untuk Fitur Hiburan (Relax)
-    Route::get('/apps', [EntertainmentController::class, 'index']); // Ambil daftar aplikasi
+    Route::get('/apps', [EntertainmentController::class, 'index']);
     Route::post('/apps/{id}/purchase', [EntertainmentController::class, 'purchase']);
-    Route::post('/apps/complete', [EntertainmentController::class, 'completeSession']); 
+    Route::post('/apps/complete', [EntertainmentController::class, 'completeSession']);
     Route::get('/coin-histori', [HistoriController::class, 'index']);
 
-    // fitur mood dan rest day
+    Route::get('/daily-record', [DailyRecordController::class, 'show']);
     Route::post('/daily-record/mood', [DailyRecordController::class, 'storeMood']);
     Route::post('/daily-record/rest-day', [DailyRecordController::class, 'useRestDay']);
-    
+
     Route::get('/user/profile', [UserController::class, 'profile']);
 });
