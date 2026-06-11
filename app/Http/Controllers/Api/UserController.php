@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Resources\UserResource;
 use App\Models\DailyRecord;
 use Illuminate\Http\Request;
@@ -29,6 +30,25 @@ class UserController extends Controller
         return response()->json([
             'success' => true,
             'data' => new UserResource($user)
+        ]);
+    }
+
+    public function updateProfile(UpdateProfileRequest $request)
+    {
+        $user = $request->user();
+
+        $user->update($request->only([
+            'name',
+            'email',
+            'username',
+            'birthday',
+            'gender',
+        ]));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Profile updated successfully',
+            'data' => new UserResource($user->fresh()),
         ]);
     }
 }

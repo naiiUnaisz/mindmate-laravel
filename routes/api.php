@@ -32,4 +32,5 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::post('/daily-record/rest-day', [DailyRecordController::class, 'useRestDay']);
 
     Route::get('/user/profile', [UserController::class, 'profile']);
+    Route::put('/user/profile', [UserController::class, 'updateProfile']);
 });

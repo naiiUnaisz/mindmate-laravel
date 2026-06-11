@@ -21,6 +21,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'username',
+        'birthday',
+        'gender',
         'coin_balance',
         'current_streak',
         'restday_quota',
@@ -46,6 +49,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'birthday' => 'date:Y-m-d',
         ];
     }
 }

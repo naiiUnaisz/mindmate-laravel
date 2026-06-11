@@ -37,9 +37,17 @@ POST /register
 {
     "name": "John Doe",
     "email": "john@example.com",
-    "password": "rahasia123"
+    "password": "rahasia123",
+    "username": "johndoe"
 }
 ```
+
+| Parameter | Tipe | Required | Keterangan |
+|---|---|---|---|
+| `name` | string | Ya | Nama lengkap |
+| `email` | string | Ya | Email (unique) |
+| `password` | string | Ya | Min 6 karakter |
+| `username` | string | Ya | Username (unique) |
 
 **Response** `201 Created`
 ```json
@@ -50,6 +58,10 @@ POST /register
         "id": 1,
         "name": "John Doe",
         "email": "john@example.com",
+        "username": "johndoe",
+        "birthday": null,
+        "age": null,
+        "gender": null,
         "coin_balance": 0,
         "current_streak": 0,
         "restday_quota": 2,
@@ -97,6 +109,10 @@ POST /login
         "id": 1,
         "name": "John Doe",
         "email": "john@example.com",
+        "username": "johndoe",
+        "birthday": "2000-01-15",
+        "age": 26,
+        "gender": "male",
         "coin_balance": 50,
         "current_streak": 3,
         "restday_quota": 2,
@@ -686,6 +702,10 @@ GET /user/profile
         "id": 1,
         "name": "John Doe",
         "email": "john@example.com",
+        "username": "johndoe",
+        "birthday": "2000-01-15",
+        "age": 26,
+        "gender": "male",
         "coin_balance": 75,
         "current_streak": 3,
         "restday_quota": 2,
@@ -695,7 +715,54 @@ GET /user/profile
 }
 ```
 
-#### 2.5.2 Logout
+#### 2.5.2 Edit Profil
+
+```
+PUT /user/profile
+```
+
+**Request Body** (semua opsional)
+```json
+{
+    "name": "John Updated",
+    "email": "johnbaru@example.com",
+    "username": "johnbaru",
+    "birthday": "2001-05-20",
+    "gender": "male"
+}
+```
+
+| Parameter | Tipe | Required | Keterangan |
+|---|---|---|---|
+| `name` | string | Tidak | Nama lengkap |
+| `email` | string | Tidak | Email (unique, kecuali milik sendiri) |
+| `username` | string | Tidak | Username (unique, kecuali milik sendiri) |
+| `birthday` | date | Tidak | Tanggal lahir (format `YYYY-MM-DD`) |
+| `gender` | string | Tidak | `male` atau `female` |
+
+**Response** `200 OK`
+```json
+{
+    "success": true,
+    "message": "Profile updated successfully",
+    "data": {
+        "id": 1,
+        "name": "John Updated",
+        "email": "johnbaru@example.com",
+        "username": "johnbaru",
+        "birthday": "2001-05-20",
+        "age": 25,
+        "gender": "male",
+        "coin_balance": 75,
+        "current_streak": 3,
+        "restday_quota": 2,
+        "created_at": "2026-06-08T10:00:00.000000Z",
+        "updated_at": "2026-06-08T13:00:00.000000Z"
+    }
+}
+```
+
+#### 2.5.3 Logout
 
 Hapus token akses yang sedang digunakan.
 
@@ -733,4 +800,5 @@ POST /logout
 | GET | `/daily-record` | Sanctum | Daily record hari ini |
 | POST | `/daily-record/mood` | Sanctum | Catat mood harian |
 | POST | `/daily-record/rest-day` | Sanctum | Gunakan rest day |
-| GET | `/user/profile` | Sanctum | Profil user |
+| GET | `/user/profile` | Sanctum | Lihat profil user |
+| PUT | `/user/profile` | Sanctum | Edit profil user |
