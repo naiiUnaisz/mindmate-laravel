@@ -8,6 +8,7 @@ use App\Http\Resources\UserResource;
 use App\Models\DailyRecord;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -36,14 +37,23 @@ class UserController extends Controller
     public function updateProfile(UpdateProfileRequest $request)
     {
         $user = $request->user();
-
-        $user->update($request->only([
+        $data = $request->only([
             'name',
             'email',
             'username',
             'birthday',
             'gender',
-        ]));
+        ]);
+
+        if ($request->hasFile('avatar')) {
+            if ($user->avatar) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $data['avatar'] = $path;
+        }
+
+        $user->update($data);
 
         return response()->json([
             'success' => true,

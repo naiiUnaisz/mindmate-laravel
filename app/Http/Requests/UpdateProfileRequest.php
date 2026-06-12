@@ -29,6 +29,7 @@ class UpdateProfileRequest extends FormRequest
             ],
             'birthday' => 'nullable|date',
             'gender' => 'nullable|in:male,female',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ];
     }
 }

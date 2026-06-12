@@ -62,6 +62,7 @@ POST /register
         "birthday": null,
         "age": null,
         "gender": null,
+        "avatar": null,
         "coin_balance": 0,
         "current_streak": 0,
         "restday_quota": 2,
@@ -113,6 +114,7 @@ POST /login
         "birthday": "2000-01-15",
         "age": 26,
         "gender": "male",
+        "avatar": "http://localhost/storage/avatars/abc123.jpg",
         "coin_balance": 50,
         "current_streak": 3,
         "restday_quota": 2,
@@ -706,6 +708,7 @@ GET /user/profile
         "birthday": "2000-01-15",
         "age": 26,
         "gender": "male",
+        "avatar": "http://localhost/storage/avatars/abc123.jpg",
         "coin_balance": 75,
         "current_streak": 3,
         "restday_quota": 2,
@@ -739,6 +742,7 @@ PUT /user/profile
 | `username` | string | Tidak | Username (unique, kecuali milik sendiri) |
 | `birthday` | date | Tidak | Tanggal lahir (format `YYYY-MM-DD`) |
 | `gender` | string | Tidak | `male` atau `female` |
+| `avatar` | file | Tidak | File gambar (jpeg,png,jpg,gif,webp, max 2MB) |
 
 **Response** `200 OK`
 ```json
@@ -753,6 +757,7 @@ PUT /user/profile
         "birthday": "2001-05-20",
         "age": 25,
         "gender": "male",
+        "avatar": "http://localhost/storage/avatars/abc123.jpg",
         "coin_balance": 75,
         "current_streak": 3,
         "restday_quota": 2,
@@ -802,3 +807,54 @@ POST /logout
 | POST | `/daily-record/rest-day` | Sanctum | Gunakan rest day |
 | GET | `/user/profile` | Sanctum | Lihat profil user |
 | PUT | `/user/profile` | Sanctum | Edit profil user |
+
+---
+
+## 4. Analisis Fitur & Arsitektur
+
+### 4.1 Autentikasi (Sanctum Token)
+Register, Login, Logout — via token Sanctum. Token diterbitkan saat register/login, dihapus saat logout.
+
+### 4.2 Task Management (CRUD + Soft Delete)
+Buat, lihat, edit, hapus task. Masing-masing task punya `coin_reward` (default 10), `task_type`, dan `is_routine`.
+
+### 4.3 Daily Check-in & Gamification (`POST /tasks/{id}/check`)
+Complete task dengan 2 jenis reward:
+- **Puzzle source**: +25 coin + 1 puzzle piece (max 6/hari). Jika 6 terkumpul: +100 bonus coin + streak naik.
+- **Cart source**: + `coin_reward` (default 10).
+- Dicatat via `CoinHistories` (polymorphic).
+
+### 4.4 Puzzle System (`PuzzlePieces`)
+6 potongan puzzle per hari. Streak bertambah jika puzzle penuh (6/6).
+
+### 4.5 Streak & Rest Day
+- `current_streak` di-reset ke 0 jika kemarin puzzle tidak penuh (kecuali rest day).
+- Quota rest day: 2 per user.
+
+### 4.6 Mood Tracking (`POST /daily-record/mood`)
+Catat mood harian: `good` / `neutral` / `bad`.
+
+### 4.7 Entertainment System
+- Lihat daftar apps (6 apps: Spotify, Netflix, YouTube, Mobile Legends, TikTok, Instagram).
+- **Purchase**: Harga inflasi 1.5x per pembelian di hari yang sama. Koin dipotong, session dibuat (`started_at` + `expired_at`).
+- **Complete Session**: Jika telat → denda 5 coin/menit, dicatat di `Punishments`.
+
+### 4.8 Coin History (`GET /coin-histori`)
+Riwayat transaksi koin (reward/expense/punishment) dengan polymorphic source.
+
+### 4.9 User Profile
+Lihat & edit profil (name, email, username, birthday, gender — age computed dari birthday).
+
+### 4.10 Arsitektur Database
+- **9 tabel utama**: `users`, `tasks`, `daily_records`, `daily_task_items`, `puzzle_pieces`, `apps`, `entertainment_logs`, `punishments`, `coin_histories`.
+- **Polymorphic `CoinHistories`**: via `morphs('source')` — mencatat reward/expense dari 3 sumber: `DailyTaskItem`, `EntertainmentLog`, `Punishment`.
+- **Per-day tracking**: `DailyRecord` (1/user/hari) → `DailyTaskItem` (many, link tasks) → `PuzzlePieces` (max 6/hari).
+- **Soft deletes** di `tasks`.
+- **Sanctum** `personal_access_tokens` untuk token auth.
+
+### 4.11 Teknis
+- Middleware `auth:sanctum` di 15 dari 18 endpoint.
+- Form Request validation, API Resources, soft deletes.
+- 18 endpoint API siap pakai.
+- **Seeder**: 6 apps hiburan + 1 test user.
+- **Catatan**: Saat ini hanya backend API. Belum ada frontend/view yang mengonsumsi API.

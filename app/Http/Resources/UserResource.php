@@ -18,6 +18,7 @@ class UserResource extends JsonResource
             'birthday' => $this->birthday,
             'age' => $this->birthday ? Carbon::parse($this->birthday)->age : null,
             'gender' => $this->gender,
+            'avatar' => $this->avatar ? url('storage/' . $this->avatar) : null,
             'coin_balance' => $this->coin_balance,
             'current_streak' => $this->current_streak,
             'restday_quota' => $this->restday_quota,

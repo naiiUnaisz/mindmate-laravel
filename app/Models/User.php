@@ -24,6 +24,7 @@ class User extends Authenticatable
         'username',
         'birthday',
         'gender',
+        'avatar',
         'coin_balance',
         'current_streak',
         'restday_quota',
