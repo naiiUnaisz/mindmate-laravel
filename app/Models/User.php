@@ -28,6 +28,7 @@ class User extends Authenticatable
         'coin_balance',
         'current_streak',
         'restday_quota',
+        'settings',
     ];
 
     // --- RELASI ---
@@ -51,6 +52,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'birthday' => 'date:Y-m-d',
+            'settings' => 'array',
         ];
     }
 }

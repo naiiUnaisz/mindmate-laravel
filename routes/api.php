@@ -33,4 +33,7 @@ Route::middleware('auth:sanctum')->group(function() {
 
     Route::get('/user/profile', [UserController::class, 'profile']);
     Route::put('/user/profile', [UserController::class, 'updateProfile']);
+    Route::post('/user/change-email', [UserController::class, 'changeEmail']);
+    Route::post('/user/change-password', [UserController::class, 'changePassword']);
+    Route::post('/user/settings', [UserController::class, 'updateSettings']);
 });

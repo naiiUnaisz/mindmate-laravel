@@ -22,6 +22,7 @@ class UserResource extends JsonResource
             'coin_balance' => $this->coin_balance,
             'current_streak' => $this->current_streak,
             'restday_quota' => $this->restday_quota,
+            'settings' => $this->settings,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

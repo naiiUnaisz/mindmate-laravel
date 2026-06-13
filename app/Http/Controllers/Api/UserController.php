@@ -3,9 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ChangeEmailRequest;
+use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\UpdateProfileRequest;
+use App\Http\Requests\UpdateSettingsRequest;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
@@ -45,6 +49,52 @@ class UserController extends Controller
             'success' => true,
             'message' => 'Profile updated successfully',
             'data' => new UserResource($user->fresh()),
+        ]);
+    }
+
+    public function changeEmail(ChangeEmailRequest $request)
+    {
+        $user = $request->user();
+
+        $user->update([
+            'email' => $request->email,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Email changed successfully',
+            'data' => new UserResource($user->fresh()),
+        ]);
+    }
+
+    public function changePassword(ChangePasswordRequest $request)
+    {
+        $user = $request->user();
+
+        $user->update([
+            'password' => Hash::make($request->new_password),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password changed successfully',
+        ]);
+    }
+
+    public function updateSettings(UpdateSettingsRequest $request)
+    {
+        $user = $request->user();
+
+        $user->update([
+            'settings' => $request->settings,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Settings updated successfully',
+            'data' => [
+                'settings' => $user->fresh()->settings,
+            ],
         ]);
     }
 }
