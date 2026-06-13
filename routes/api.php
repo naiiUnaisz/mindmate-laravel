@@ -25,6 +25,12 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::get('/apps', [EntertainmentController::class, 'index']);
     Route::post('/apps/{id}/purchase', [EntertainmentController::class, 'purchase']);
     Route::post('/apps/complete', [EntertainmentController::class, 'completeSession']);
+
+    Route::post('/relax/session/start', [EntertainmentController::class, 'sessionStart']);
+    Route::post('/relax/session/end', [EntertainmentController::class, 'sessionEnd']);
+    Route::get('/relax/session/active', [EntertainmentController::class, 'activeSession']);
+    Route::get('/relax/session/history', [EntertainmentController::class, 'sessionHistory']);
+
     Route::get('/coin-histori', [HistoriController::class, 'index']);
 
     Route::get('/daily-record', [DailyRecordController::class, 'show']);
