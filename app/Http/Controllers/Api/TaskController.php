@@ -77,6 +77,7 @@ class TaskController extends Controller
         $user = $request->user();
         $task = $user->tasks()->findOrFail($id);
         $today = Carbon::today()->toDateString();
+        $yesterday = Carbon::yesterday()->toDateString();
 
         $source = $request->input('source', 'cart');
 
@@ -84,6 +85,17 @@ class TaskController extends Controller
             ['user_id' => $user->id, 'date' => $today],
             ['mood_level' => 'neutral', 'is_rest_day' => false, 'puzzle_completed_count' => 0]
         );
+
+        $yesterdayRecord = DailyRecord::where('user_id', $user->id)
+            ->where('date', $yesterday)
+            ->first();
+
+        if (!$yesterdayRecord || (!$yesterdayRecord->is_rest_day && $yesterdayRecord->puzzle_completed_count < 6)) {
+            if ($user->current_streak > 0) {
+                $user->current_streak = 0;
+                $user->save();
+            }
+        }
 
         $dailyTaskItem = DailyTaskItem::firstOrCreate(
             ['daily_record_id' => $dailyRecord->id, 'task_id' => $task->id],
@@ -119,7 +131,7 @@ class TaskController extends Controller
                 $puzzleOpened = true;
                 $currentPieces++;
 
-                if ($currentPieces == 6) {
+                if ($currentPieces == 6 && !$dailyRecord->is_rest_day) {
                     $rewardAmount += 100;
                     $user->increment('current_streak');
                 }
