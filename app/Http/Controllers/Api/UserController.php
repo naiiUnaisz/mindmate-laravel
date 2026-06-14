@@ -27,13 +27,13 @@ class UserController extends Controller
     public function updateProfile(UpdateProfileRequest $request)
     {
         $user = $request->user();
-        $data = $request->only([
+        $data = array_filter($request->only([
             'name',
             'email',
             'username',
             'birthday',
             'gender',
-        ]);
+        ]), fn($value) => $value !== null);
 
         if ($request->hasFile('avatar')) {
             if ($user->avatar) {
