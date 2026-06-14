@@ -137,7 +137,7 @@ class TaskController extends Controller
                 }
             }
         } else {
-            $rewardAmount = 10;
+            $rewardAmount = $task->coin_reward;
             $task->update(['is_checked' => true]);
         }
 

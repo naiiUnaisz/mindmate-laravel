@@ -39,7 +39,21 @@ Route::middleware('auth:sanctum')->group(function() {
 
     Route::get('/user/profile', [UserController::class, 'profile']);
     Route::put('/user/profile', [UserController::class, 'updateProfile']);
+    Route::put('/user/update', [UserController::class, 'updateProfile']);
     Route::post('/user/change-email', [UserController::class, 'changeEmail']);
     Route::post('/user/change-password', [UserController::class, 'changePassword']);
     Route::post('/user/settings', [UserController::class, 'updateSettings']);
+
+    Route::get('/streak', [UserController::class, 'streak']);
+    Route::post('/streak/increment', [UserController::class, 'incrementStreak']);
+
+    Route::post('/mood', [DailyRecordController::class, 'storeMood']);
+    Route::get('/mood/history', [DailyRecordController::class, 'moodHistory']);
+
+    Route::get('/coins/history', [HistoriController::class, 'index']);
+    Route::post('/coins/earn', [HistoriController::class, 'earnCoins']);
+    Route::post('/coins/spend', [HistoriController::class, 'spendCoins']);
+
+    Route::get('/puzzles', [DailyRecordController::class, 'puzzles']);
+    Route::post('/puzzles/unlock', [DailyRecordController::class, 'unlockPuzzle']);
 });

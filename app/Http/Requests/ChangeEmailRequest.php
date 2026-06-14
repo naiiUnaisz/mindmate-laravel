@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ChangeEmailRequest extends FormRequest
 {
@@ -14,7 +15,11 @@ class ChangeEmailRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|email|unique:users',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('users')->ignore($this->user()->id),
+            ],
         ];
     }
 }

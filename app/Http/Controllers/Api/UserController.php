@@ -97,4 +97,31 @@ class UserController extends Controller
             ],
         ]);
     }
+
+    public function streak(Request $request)
+    {
+        $user = $request->user();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'current_streak' => $user->current_streak,
+                'restday_quota' => $user->restday_quota,
+            ]
+        ]);
+    }
+
+    public function incrementStreak(Request $request)
+    {
+        $user = $request->user();
+        $user->increment('current_streak');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Streak berhasil ditambah',
+            'data' => [
+                'current_streak' => $user->current_streak,
+            ]
+        ]);
+    }
 }

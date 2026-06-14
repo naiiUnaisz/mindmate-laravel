@@ -8,6 +8,7 @@ use App\Models\DailyTaskItem;
 use App\Models\EntertainmentLog;
 use App\Models\Punishment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class HistoriController extends Controller
 {
@@ -49,6 +50,74 @@ class HistoriController extends Controller
             'success' => true,
             'current_balance' => $user->coin_balance,
             'data' => $formattedData
+        ]);
+    }
+
+    public function earnCoins(Request $request)
+    {
+        $user = $request->user();
+
+        $validator = Validator::make($request->all(), [
+            'amount' => 'required|integer|min:1',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first()
+            ], 422);
+        }
+
+        $amount = (int) $request->amount;
+
+        $user->increment('coin_balance', $amount);
+
+        CoinHistories::create([
+            'user_id' => $user->id,
+            'amount' => $amount,
+            'status' => 'reward',
+            'source_type' => 'manual',
+            'source_id' => 0,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => "$amount koin berhasil ditambahkan",
+            'current_balance' => $user->coin_balance,
+        ]);
+    }
+
+    public function spendCoins(Request $request)
+    {
+        $user = $request->user();
+
+        $validator = Validator::make($request->all(), [
+            'amount' => 'required|integer|min:1',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first()
+            ], 422);
+        }
+
+        $amount = (int) $request->amount;
+
+        $user->decrement('coin_balance', $amount);
+
+        CoinHistories::create([
+            'user_id' => $user->id,
+            'amount' => $amount,
+            'status' => 'expense',
+            'source_type' => 'manual',
+            'source_id' => 0,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => "$amount koin berhasil digunakan",
+            'current_balance' => $user->coin_balance,
         ]);
     }
 }
