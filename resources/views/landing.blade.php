@@ -43,13 +43,13 @@
                 <a href="#preview" class="hover:text-[#6C5CE7] transition md:pb-1 w-full md:w-auto text-center">Preview</a>
 
                 <div class="flex flex-col gap-3 w-full mt-2 pt-4 border-t border-slate-100 md:hidden">
-                    <a href="#" class="text-[#6C5CE7] hover:text-[#5b4cc4] rounded-xl transition py-2.5 px-5 text-center bg-purple-50 font-semibold">Sign in</a>
+                    
                     <a href="#" class="bg-[#6C5CE7] text-white py-2.5 px-5 rounded-xl hover:bg-[#5b4cc4] transition text-center font-semibold shadow-sm">Download</a>
                 </div>
             </nav>
 
             <div class="hidden md:flex items-center gap-4 text-sm font-medium">
-                <a href="#" class="text-[#6C5CE7] hover:text-[#5b4cc4] rounded-xl transition py-2.5 px-5 shadow-sm shadow-purple-200">Sign in</a>
+        
                 <a href="#" class="bg-[#6C5CE7] text-white py-2.5 px-5 rounded-xl hover:bg-[#5b4cc4] transition shadow-sm shadow-purple-200">Download</a>
             </div>
 
