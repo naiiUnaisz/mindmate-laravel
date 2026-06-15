@@ -19,6 +19,11 @@
         html {
             scroll-behavior: smooth;
         }
+
+        .nav-link.active-nav {
+            color: #6C5CE7 !important;
+            font-weight: 600 !important;
+        }
     </style>
 </head>
 
@@ -38,9 +43,9 @@
             <input type="checkbox" id="menu-toggle" class="peer hidden">
 
             <nav class="absolute top-full left-0 w-full bg-white shadow-xl md:shadow-none p-6 md:p-0 flex flex-col md:flex-row items-center gap-6 md:gap-10 text-sm font-medium text-black max-h-0 md:max-h-none overflow-hidden peer-checked:max-h-[400px] transition-all duration-300 ease-in-out box-border z-40 md:static md:w-auto md:bg-transparent">
-                <a href="#feature" class="text-[#6C5CE7] md:pb-1 w-full md:w-auto text-center font-semibold">Feature</a>
-                <a href="#how-it-works" class="hover:text-[#6C5CE7] transition md:pb-1 w-full md:w-auto text-center">How It Works</a>
-                <a href="#preview" class="hover:text-[#6C5CE7] transition md:pb-1 w-full md:w-auto text-center">Preview</a>
+                <a href="#feature" onclick="event.preventDefault(); setActive(this); document.getElementById('feature').scrollIntoView({behavior:'smooth'});" class="nav-link active-nav md:pb-1 w-full md:w-auto text-center">Feature</a>
+                <a href="#how-it-works" onclick="event.preventDefault(); setActive(this); document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'});" class="nav-link hover:text-[#6C5CE7] transition md:pb-1 w-full md:w-auto text-center">How It Works</a>
+                <a href="#preview" onclick="event.preventDefault(); setActive(this); document.getElementById('preview').scrollIntoView({behavior:'smooth'});" class="nav-link hover:text-[#6C5CE7] transition md:pb-1 w-full md:w-auto text-center">Preview</a>
 
                 <div class="flex flex-col gap-3 w-full mt-2 pt-4 border-t border-slate-100 md:hidden">
                     
@@ -311,6 +316,15 @@
         </div>
 
     </footer>
+
+<script>
+function setActive(el) {
+    document.querySelectorAll('.nav-link').forEach(function(link) {
+        link.classList.remove('active-nav');
+    });
+    el.classList.add('active-nav');
+}
+</script>
 
 </body>
 
