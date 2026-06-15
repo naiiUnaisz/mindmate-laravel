@@ -50,13 +50,13 @@
 
                 <div class="flex flex-col gap-3 w-full mt-2 pt-4 border-t border-slate-100 md:hidden">
                     
-                    <a href="javascript:void(0)" onclick="showDownloadModal()" class="bg-[#6C5CE7] text-white py-2.5 px-5 rounded-xl hover:bg-[#5b4cc4] transition text-center font-semibold shadow-sm">Download</a>
+                    <a href="javascript:void(0)" onclick="showDownloadModal()" class="bg-[#6C5CE7] text-white py-2.5 px-5 rounded-xl hover:bg-[#5b4cc4] transition text-center font-semibold shadow-sm"><i class="fa-solid fa-download mr-2"></i>Download</a>
                 </div>
             </nav>
 
             <div class="hidden md:flex items-center gap-4 text-sm font-medium">
         
-                <a href="javascript:void(0)" onclick="showDownloadModal()" class="bg-[#6C5CE7] text-white py-2.5 px-5 rounded-xl hover:bg-[#5b4cc4] transition shadow-sm shadow-purple-200">Download</a>
+                <a href="javascript:void(0)" onclick="showDownloadModal()" class="bg-[#6C5CE7] text-white py-2.5 px-5 rounded-xl hover:bg-[#5b4cc4] transition shadow-sm shadow-purple-200"><i class="fa-solid fa-download mr-2"></i>Download</a>
             </div>
 
             <label for="menu-toggle" class="md:hidden flex flex-col gap-1.5 cursor-pointer p-2 text-slate-800 z-50 select-none">
@@ -82,7 +82,7 @@
 
             <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 w-full max-w-sm mx-auto md:mx-0">
                 <a href="javascript:void(0)" onclick="showDownloadModal()" class="w-full sm:w-auto px-6 py-3 text-white bg-[#6C5CE7] rounded-xl font-medium text-center hover:bg-[#5b4cc4] transition shadow-md shadow-purple-200 flex items-center justify-center gap-1">
-                    Download <i class="fa-solid fa-chevron-right text-xs ml-1"></i>
+                    <i class="fa-solid fa-download mr-2"></i>Download
                 </a>
                 
             
