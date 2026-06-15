@@ -50,13 +50,13 @@
 
                 <div class="flex flex-col gap-3 w-full mt-2 pt-4 border-t border-slate-100 md:hidden">
                     
-                    <a href="#" class="bg-[#6C5CE7] text-white py-2.5 px-5 rounded-xl hover:bg-[#5b4cc4] transition text-center font-semibold shadow-sm">Download</a>
+                    <a href="javascript:void(0)" onclick="showDownloadModal()" class="bg-[#6C5CE7] text-white py-2.5 px-5 rounded-xl hover:bg-[#5b4cc4] transition text-center font-semibold shadow-sm">Download</a>
                 </div>
             </nav>
 
             <div class="hidden md:flex items-center gap-4 text-sm font-medium">
         
-                <a href="#" class="bg-[#6C5CE7] text-white py-2.5 px-5 rounded-xl hover:bg-[#5b4cc4] transition shadow-sm shadow-purple-200">Download</a>
+                <a href="javascript:void(0)" onclick="showDownloadModal()" class="bg-[#6C5CE7] text-white py-2.5 px-5 rounded-xl hover:bg-[#5b4cc4] transition shadow-sm shadow-purple-200">Download</a>
             </div>
 
             <label for="menu-toggle" class="md:hidden flex flex-col gap-1.5 cursor-pointer p-2 text-slate-800 z-50 select-none">
@@ -81,7 +81,7 @@
             </p>
 
             <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 w-full max-w-sm mx-auto md:mx-0">
-                <a href="#" class="w-full sm:w-auto px-6 py-3 text-white bg-[#6C5CE7] rounded-xl font-medium text-center hover:bg-[#5b4cc4] transition shadow-md shadow-purple-200 flex items-center justify-center gap-1">
+                <a href="javascript:void(0)" onclick="showDownloadModal()" class="w-full sm:w-auto px-6 py-3 text-white bg-[#6C5CE7] rounded-xl font-medium text-center hover:bg-[#5b4cc4] transition shadow-md shadow-purple-200 flex items-center justify-center gap-1">
                     Download <i class="fa-solid fa-chevron-right text-xs ml-1"></i>
                 </a>
                 
@@ -318,12 +318,37 @@
 
     </footer>
 
+<div id="downloadModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[999] hidden">
+    <div class="bg-white rounded-3xl p-8 max-w-sm mx-4 shadow-2xl text-center">
+        <div class="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full bg-yellow-100">
+            <i class="fa-solid fa-triangle-exclamation text-3xl text-yellow-500"></i>
+        </div>
+        <h3 class="text-xl font-bold text-slate-800 mb-2">Download MindMate</h3>
+        <p class="text-sm text-slate-500 mb-6 leading-relaxed">
+            Aplikasi ini tidak tersedia di Play Store. Anda akan mengunduh file APK dari sumber tidak resmi. 
+            Pastikan Anda mengaktifkan <strong>"Install dari sumber tidak dikenal"</strong> di pengaturan HP Anda.
+        </p>
+        <div class="flex gap-3">
+            <button onclick="closeDownloadModal()" class="flex-1 py-3 border border-slate-200 rounded-xl text-slate-600 font-medium hover:bg-slate-50 transition">Batal</button>
+            <a href="{{ asset('apk-mindmate/mindmate.apk') }}" download="MindMate.apk" onclick="closeDownloadModal()" class="flex-1 py-3 bg-[#6C5CE7] text-white rounded-xl font-medium hover:bg-[#5b4cc4] transition text-center">Download</a>
+        </div>
+    </div>
+</div>
+
 <script>
 function setActive(el) {
     document.querySelectorAll('.nav-link').forEach(function(link) {
         link.classList.remove('active-nav');
     });
     el.classList.add('active-nav');
+}
+
+function showDownloadModal() {
+    document.getElementById('downloadModal').classList.remove('hidden');
+}
+
+function closeDownloadModal() {
+    document.getElementById('downloadModal').classList.add('hidden');
 }
 </script>
 
