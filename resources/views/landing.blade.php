@@ -78,9 +78,8 @@
                 <a href="#" class="w-full sm:w-auto px-6 py-3 text-white bg-[#6C5CE7] rounded-xl font-medium text-center hover:bg-[#5b4cc4] transition shadow-md shadow-purple-200 flex items-center justify-center gap-1">
                     Download <i class="fa-solid fa-chevron-right text-xs ml-1"></i>
                 </a>
-                <a href="#" class="w-full sm:w-auto px-6 py-3 text-[#6C5CE7] border border-[#6C5CE7]/30 bg-white rounded-xl font-medium text-center hover:bg-slate-50 transition">
-                    Sign in
-                </a>
+                
+            
             </div>
         </div>
 
