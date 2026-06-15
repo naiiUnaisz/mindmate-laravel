@@ -7,6 +7,7 @@ use App\Http\Requests\StoreMoodRequest;
 use App\Http\Resources\DailyRecordResource;
 use App\Models\CoinHistories;
 use App\Models\DailyRecord;
+use App\Models\DailyTaskItem;
 use App\Models\PuzzlePieces;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -175,8 +176,25 @@ class DailyRecordController extends Controller
             ], 400);
         }
 
+        $dailyTaskItem = DailyTaskItem::where('daily_record_id', $dailyRecord->id)->first();
+        if (!$dailyTaskItem) {
+            $task = $user->tasks()->first();
+            if (!$task) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Kamu belum punya tugas! Buat tugas dulu untuk membuka puzzle.'
+                ], 400);
+            }
+            $dailyTaskItem = DailyTaskItem::create([
+                'daily_record_id' => $dailyRecord->id,
+                'task_id' => $task->id,
+                'is_completed' => false,
+            ]);
+        }
+
         $piece = PuzzlePieces::create([
             'daily_record_id' => $dailyRecord->id,
+            'daily_task_item_id' => $dailyTaskItem->id,
             'piece_number' => $currentPieces + 1,
             'is_opened' => true,
             'opened_at' => now(),

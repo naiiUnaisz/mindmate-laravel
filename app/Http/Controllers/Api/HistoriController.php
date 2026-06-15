@@ -104,6 +104,13 @@ class HistoriController extends Controller
 
         $amount = (int) $request->amount;
 
+        if ($user->coin_balance < $amount) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Koin tidak mencukupi! Saldo kamu: ' . $user->coin_balance
+            ], 400);
+        }
+
         $user->decrement('coin_balance', $amount);
 
         CoinHistories::create([

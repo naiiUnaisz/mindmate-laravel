@@ -203,6 +203,13 @@ class EntertainmentController extends Controller
         if ($lateMinutes > 0) {
             $fineAmount = $lateMinutes * 5;
 
+            if ($user->coin_balance < $fineAmount) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Koin tidak cukup untuk denda {$fineAmount}! Saldo kamu: {$user->coin_balance}. Perpanjang sesi atau selesaikan tugas dulu."
+                ], 400);
+            }
+
             $user->decrement('coin_balance', $fineAmount);
 
             $session->update(['status' => 'fined']);
@@ -345,6 +352,13 @@ class EntertainmentController extends Controller
             }
 
             $fineAmount = $minutesLate * 5;
+
+            if ($user->coin_balance < $fineAmount) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Koin tidak cukup untuk denda {$fineAmount}! Saldo kamu: {$user->coin_balance}."
+                ], 400);
+            }
 
             $user->decrement('coin_balance', $fineAmount);
 
