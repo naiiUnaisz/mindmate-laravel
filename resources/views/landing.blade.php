@@ -325,11 +325,11 @@
         </div>
         <h3 class="text-xl font-bold text-slate-800 mb-2">Download MindMate</h3>
         <p class="text-sm text-slate-500 mb-6 leading-relaxed">
-            Aplikasi ini tidak tersedia di Play Store. Anda akan mengunduh file APK dari sumber tidak resmi. 
-            Pastikan Anda mengaktifkan <strong>"Install dari sumber tidak dikenal"</strong> di pengaturan HP Anda.
+            This app is not available on the Play Store. You will download an APK file from an unofficial source.
+            Make sure you enable <strong>Install from unknown sources</strong> in your phone settings.
         </p>
         <div class="flex gap-3">
-            <button onclick="closeDownloadModal()" class="flex-1 py-3 border border-slate-200 rounded-xl text-slate-600 font-medium hover:bg-slate-50 transition">Batal</button>
+            <button onclick="closeDownloadModal()" class="flex-1 py-3 border border-slate-200 rounded-xl text-slate-600 font-medium hover:bg-slate-50 transition">Cancel</button>
             <a href="{{ asset('apk-mindmate/mindmate.apk') }}" download="MindMate.apk" onclick="closeDownloadModal()" class="flex-1 py-3 bg-[#6C5CE7] text-white rounded-xl font-medium hover:bg-[#5b4cc4] transition text-center">Download</a>
         </div>
     </div>
