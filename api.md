@@ -166,6 +166,7 @@ GET /tasks
             "task_type": "belajar",
             "is_routine": false,
             "is_checked": false,
+            "is_completed_today": false,
             "created_at": "2026-06-08T10:00:00.000000Z",
             "updated_at": "2026-06-08T10:00:00.000000Z"
         }
@@ -192,6 +193,7 @@ GET /tasks/{id}
         "task_type": "belajar",
         "is_routine": false,
         "is_checked": false,
+        "is_completed_today": false,
         "created_at": "2026-06-08T10:00:00.000000Z",
         "updated_at": "2026-06-08T10:00:00.000000Z"
     }
@@ -220,7 +222,7 @@ POST /tasks
 | `title` | string | Ya | - | Judul tugas |
 | `description` | string | Tidak | null | Deskripsi tugas |
 | `is_routine` | boolean | Tidak | false | Apakah tugas rutin |
-| `coin_reward` | integer | Tidak | 10 | Koin yang didapat saat checklist |
+| `coin_reward` | integer | Tidak | 10 | Koin yang didapat (legacy, reward sekarang fixed +10) |
 | `task_type` | string | Tidak | null | Kategori tugas |
 
 **Response** `201 Created`
@@ -323,14 +325,15 @@ Menandai tugas selesai untuk hari ini. Koin otomatis ditambahkan, dan potongan p
 |---|---|---|---|
 | `source` | string | `"cart"` | Asal checklist: `"cart"` (To-Do List) atau `"puzzle"` (Halaman Puzzle) |
 
-**Logic Penting:**
-- Jika `source = "puzzle"`:
-  - Membuka 1 piece puzzle (maksimal 6 per hari)
-  - Jika puzzle mencapai 6/6: bonus **+100 coin** + streak bertambah
-  - Jika puzzle sudah penuh (6/6): tidak ada reward (tidak membuka piece baru)
-- Jika `source = "cart"`:
-  - Mendapatkan `coin_reward` dari task
-  - Task ditandai `is_checked = true`
+**Logic Reward:**
+
+- **`source = "cart"`**: Mendapat **+10 coin** (fixed). Task ditandai `is_checked = true`.
+- **`source = "puzzle"`**:
+  - Membuka 1 piece puzzle (maksimal 6 per hari) → **+10 coin**
+  - Jika puzzle mencapai **6/6**: bonus **+100 coin** + **streak +1**
+  - Jika puzzle sudah penuh (6/6): tidak membuka piece baru
+
+> **Catatan:** Sebelum memberi reward, sistem mengecek streak kemarin. Jika kemarin puzzle tidak penuh (kecuali rest day), streak di-reset ke 0.
 
 **Response** `200 OK` (cart)
 ```json
@@ -343,7 +346,7 @@ Menandai tugas selesai untuk hari ini. Koin otomatis ditambahkan, dan potongan p
         "current_puzzle_count": 0,
         "coins_earned": 10,
         "current_coin_balance": 50,
-        "current_streak": 0
+        "current_streak": 3
     }
 }
 ```
@@ -359,7 +362,7 @@ Menandai tugas selesai untuk hari ini. Koin otomatis ditambahkan, dan potongan p
         "current_puzzle_count": 3,
         "coins_earned": 10,
         "current_coin_balance": 60,
-        "current_streak": 0
+        "current_streak": 3
     }
 }
 ```
@@ -375,7 +378,7 @@ Menandai tugas selesai untuk hari ini. Koin otomatis ditambahkan, dan potongan p
         "current_puzzle_count": 6,
         "coins_earned": 110,
         "current_coin_balance": 170,
-        "current_streak": 1
+        "current_streak": 4
     }
 }
 ```
@@ -527,6 +530,27 @@ POST /daily-record/rest-day
 }
 ```
 
+#### 2.2.4 Riwayat Mood
+
+```
+GET /mood/history
+```
+
+**Response** `200 OK`
+```json
+{
+    "success": true,
+    "data": [
+        {
+            "id": 1,
+            "date": "2026-06-08",
+            "mood_level": "good",
+            "is_rest_day": false
+        }
+    ]
+}
+```
+
 ---
 
 ### 2.3 Fitur Hiburan (Relax)
@@ -564,7 +588,7 @@ POST /apps/{id}/purchase
 ```
 
 **Logic:**
-- Harga mengalami **inflasi** setiap pembelian di hari yang sama: `harga_asli × 2^jumlah_pembelian_hari_ini`
+- Harga mengalami **inflasi** setiap pembelian di hari yang sama: `harga_asli × 1.5^(jumlah_pembelian_hari_ini)`
 - Hanya bisa 1 sesi aktif dalam satu waktu
 - Sesi otomatis memiliki `expired_at` = waktu sekarang + durasi menit
 
@@ -600,19 +624,165 @@ POST /apps/{id}/purchase
 }
 ```
 
-#### 2.3.3 Selesaikan / Absen Sesi Hiburan
+#### 2.3.3 Mulai Sesi Hiburan (Manual)
+
+```
+POST /relax/session/start
+```
+
+**Request Body**
+```json
+{
+    "app_id": 1,
+    "duration": 30
+}
+```
+
+| Parameter | Tipe | Required | Default | Keterangan |
+|---|---|---|---|---|
+| `app_id` | integer | Ya | - | ID aplikasi hiburan |
+| `duration` | integer | Tidak | `duration_minutes` dari app | Durasi sesi dalam menit (min 1, max 180) |
+
+**Response** `200 OK`
+```json
+{
+    "success": true,
+    "message": "Sesi hiburan dimulai!",
+    "data": {
+        "session_id": 1,
+        "app_name": "YouTube",
+        "app_url": "https://youtube.com",
+        "duration_minutes": 30,
+        "start_time": "2026-06-08 10:00:00",
+        "expired_at": "2026-06-08 10:30:00",
+        "coins_spent": 30,
+        "current_coin_balance": 20
+    }
+}
+```
+
+#### 2.3.4 Akhiri Sesi Hiburan (Manual)
+
+```
+POST /relax/session/end
+```
+
+**Request Body**
+```json
+{
+    "session_id": 1,
+    "late_minutes": 5
+}
+```
+
+| Parameter | Tipe | Required | Default | Keterangan |
+|---|---|---|---|---|
+| `session_id` | integer | Ya | - | ID sesi yang akan diakhiri |
+| `late_minutes` | integer | Tidak | 0 | Jumlah menit keterlambatan |
+
+**Logic Denda:**
+- Jika `late_minutes > 0`: denda = `late_minutes × 5 coin`, status `fined`
+- Jika `late_minutes = 0`: status `absen_success`, tanpa denda
+
+**Response** `200 OK` (tepat waktu)
+```json
+{
+    "success": true,
+    "message": "Sesi selesai tepat waktu!",
+    "data": {
+        "status": "absen_success",
+        "current_coin_balance": 20
+    }
+}
+```
+
+**Response** `200 OK` (telat)
+```json
+{
+    "success": true,
+    "message": "Kamu telat 5 menit. Koin dipotong 25.",
+    "data": {
+        "status": "fined",
+        "fine_amount": 25,
+        "current_coin_balance": -5
+    }
+}
+```
+
+#### 2.3.5 Cek Sesi Aktif
+
+```
+GET /relax/session/active
+```
+
+**Response** `200 OK` (ada sesi aktif)
+```json
+{
+    "success": true,
+    "data": {
+        "session_id": 1,
+        "app_id": 1,
+        "app_name": "YouTube",
+        "app_url": "https://youtube.com",
+        "start_time": "2026-06-08 10:00:00",
+        "expired_at": "2026-06-08 10:30:00",
+        "remaining_minutes": 15,
+        "status": "playing"
+    }
+}
+```
+
+**Response** `200 OK` (tidak ada sesi aktif)
+```json
+{
+    "success": true,
+    "data": null
+}
+```
+
+#### 2.3.6 Riwayat Sesi Hiburan
+
+```
+GET /relax/session/history
+```
+
+**Response** `200 OK`
+```json
+{
+    "success": true,
+    "data": [
+        {
+            "session_id": 1,
+            "app_name": "YouTube",
+            "start_time": "2026-06-08 10:00:00",
+            "expired_at": "2026-06-08 10:30:00",
+            "status": "absen_success",
+            "fine_amount": null,
+            "created_at": "2026-06-08T10:00:00.000000Z"
+        }
+    ],
+    "pagination": {
+        "current_page": 1,
+        "last_page": 1,
+        "per_page": 20,
+        "total": 1
+    }
+}
+```
+
+#### 2.3.7 Absen Sesi Otomatis (Complete)
 
 ```
 POST /apps/complete
 ```
 
+Mengakhiri sesi aktif secara otomatis. Sistem menghitung keterlambatan dari `expired_at`.
+
 **Logic Denda:**
 - Jika waktu sekarang **melebihi** `expired_at`:
-  - Grace period < 1 menit: dianggap **tepat waktu** (tidak kena denda, status `absen_success`)
-  - Jika telat ≥ 1 menit: denda = **menit telat × 5 coin** (status `fined`)
+  - Grace period < 1 menit: dianggap **tepat waktu** (status `absen_success`)
+  - Jika telat ≥ 1 menit: denda = `menit telat × 5 coin` (status `fined`)
 - Jika **tepat waktu / lebih awal**: status `absen_success`, tanpa denda
-
-> Catatan: Saldo koin bisa menjadi **minus** jika jumlah denda melebihi saldo yang dimiliki.
 
 **Response** `200 OK` (tepat waktu / grace period)
 ```json
@@ -688,9 +858,137 @@ GET /coin-histori
 
 ---
 
-### 2.5 Fitur Profil & Logout
+### 2.5 Fitur Koin (Manual)
 
-#### 2.5.1 Profil User
+#### 2.5.1 Tambah Koin
+
+```
+POST /coins/earn
+```
+
+**Request Body**
+```json
+{
+    "amount": 50
+}
+```
+
+**Response** `200 OK`
+```json
+{
+    "success": true,
+    "message": "50 koin berhasil ditambahkan",
+    "current_balance": 150
+}
+```
+
+#### 2.5.2 Kurangi Koin
+
+```
+POST /coins/spend
+```
+
+**Request Body**
+```json
+{
+    "amount": 30
+}
+```
+
+**Response** `200 OK`
+```json
+{
+    "success": true,
+    "message": "30 koin berhasil digunakan",
+    "current_balance": 120
+}
+```
+
+#### 2.5.3 Riwayat Koin (alias)
+
+```
+GET /coins/history
+```
+
+Sama seperti `/coin-histori`.
+
+---
+
+### 2.6 Fitur Puzzle
+
+#### 2.6.1 Status Puzzle Hari Ini
+
+```
+GET /puzzles
+```
+
+**Response** `200 OK`
+```json
+{
+    "success": true,
+    "data": {
+        "date": "2026-06-08",
+        "puzzle_completed_count": 3,
+        "is_rest_day": false,
+        "puzzle_pieces": [
+            {
+                "id": 1,
+                "daily_record_id": 1,
+                "daily_task_item_id": 1,
+                "piece_number": 1,
+                "is_opened": true,
+                "opened_at": "2026-06-08T10:00:00.000000Z",
+                "created_at": "2026-06-08T10:00:00.000000Z",
+                "updated_at": "2026-06-08T10:00:00.000000Z"
+            }
+        ]
+    }
+}
+```
+
+#### 2.6.2 Buka Puzzle (Tanpa Task)
+
+```
+POST /puzzles/unlock
+```
+
+Membuka 1 piece puzzle secara langsung tanpa harus melalui checklist task.
+
+**Logic:**
+- Maksimal 6 piece per hari
+- Per piece: **+25 coin**
+- Jika mencapai 6/6 dan bukan rest day: bonus **+100 coin** + **streak +1**
+
+**Response** `200 OK`
+```json
+{
+    "success": true,
+    "message": "Potongan puzzle berhasil dibuka!",
+    "data": {
+        "piece": {
+            "id": 2,
+            "daily_record_id": 1,
+            "daily_task_item_id": 1,
+            "piece_number": 2,
+            "is_opened": true,
+            "opened_at": "2026-06-08T11:00:00.000000Z",
+            "created_at": "2026-06-08T11:00:00.000000Z",
+            "updated_at": "2026-06-08T11:00:00.000000Z"
+        },
+        "current_puzzle_count": 2,
+        "is_complete": false,
+        "coins_earned": 25,
+        "current_coin_balance": 100,
+        "current_streak": 3
+    }
+}
+```
+
+---
+
+### 2.7 Fitur Profil & Settings
+
+#### 2.7.1 Profil User
 
 ```
 GET /user/profile
@@ -712,19 +1010,20 @@ GET /user/profile
         "coin_balance": 75,
         "current_streak": 3,
         "restday_quota": 2,
+        "settings": null,
         "created_at": "2026-06-08T10:00:00.000000Z",
         "updated_at": "2026-06-08T12:00:00.000000Z"
     }
 }
 ```
 
-#### 2.5.2 Edit Profil
+#### 2.7.2 Edit Profil
 
 ```
 PUT /user/profile
 ```
 
-**Request Body** (semua opsional)
+**Request Body** (semua opsional, multipart/form-data untuk avatar)
 ```json
 {
     "name": "John Updated",
@@ -757,7 +1056,7 @@ PUT /user/profile
         "birthday": "2001-05-20",
         "age": 25,
         "gender": "male",
-        "avatar": "http://localhost/storage/avatars/abc123.jpg",
+        "avatar": "http://localhost/storage/avatars/xyz789.jpg",
         "coin_balance": 75,
         "current_streak": 3,
         "restday_quota": 2,
@@ -767,7 +1066,101 @@ PUT /user/profile
 }
 ```
 
-#### 2.5.3 Logout
+#### 2.7.3 Ganti Email
+
+```
+POST /user/change-email
+```
+
+**Request Body**
+```json
+{
+    "email": "emailbaru@example.com"
+}
+```
+
+**Response** `200 OK`
+```json
+{
+    "success": true,
+    "message": "Email changed successfully",
+    "data": { ... }
+}
+```
+
+#### 2.7.4 Ganti Password
+
+```
+POST /user/change-password
+```
+
+**Request Body**
+```json
+{
+    "current_password": "rahasia123",
+    "new_password": "rahasia456",
+    "new_password_confirmation": "rahasia456"
+}
+```
+
+**Response** `200 OK`
+```json
+{
+    "success": true,
+    "message": "Password changed successfully"
+}
+```
+
+#### 2.7.5 Update Settings
+
+```
+POST /user/settings
+```
+
+**Request Body**
+```json
+{
+    "settings": {
+        "theme": "dark",
+        "notification": true
+    }
+}
+```
+
+**Response** `200 OK`
+```json
+{
+    "success": true,
+    "message": "Settings updated successfully",
+    "data": {
+        "settings": {
+            "theme": "dark",
+            "notification": true
+        }
+    }
+}
+```
+
+#### 2.7.6 Cek Streak
+
+```
+GET /streak
+```
+
+**Response** `200 OK`
+```json
+{
+    "success": true,
+    "data": {
+        "current_streak": 3,
+        "restday_quota": 2
+    }
+}
+```
+
+---
+
+### 2.8 Logout
 
 Hapus token akses yang sedang digunakan.
 
@@ -801,60 +1194,240 @@ POST /logout
 | GET | `/apps` | Sanctum | Daftar aplikasi hiburan |
 | POST | `/apps/{id}/purchase` | Sanctum | Beli sesi hiburan |
 | POST | `/apps/complete` | Sanctum | Absen selesai hiburan |
-| GET | `/coin-histori` | Sanctum | Riwayat koin |
+| POST | `/relax/session/start` | Sanctum | Mulai sesi hiburan manual |
+| POST | `/relax/session/end` | Sanctum | Akhiri sesi hiburan manual |
+| GET | `/relax/session/active` | Sanctum | Cek sesi aktif |
+| GET | `/relax/session/history` | Sanctum | Riwayat sesi hiburan |
 | GET | `/daily-record` | Sanctum | Daily record hari ini |
 | POST | `/daily-record/mood` | Sanctum | Catat mood harian |
 | POST | `/daily-record/rest-day` | Sanctum | Gunakan rest day |
+| GET | `/mood/history` | Sanctum | Riwayat mood |
+| GET | `/puzzles` | Sanctum | Status puzzle hari ini |
+| POST | `/puzzles/unlock` | Sanctum | Buka puzzle tanpa task |
+| GET | `/coin-histori` | Sanctum | Riwayat koin |
+| GET | `/coins/history` | Sanctum | Riwayat koin (alias) |
+| POST | `/coins/earn` | Sanctum | Tambah koin manual |
+| POST | `/coins/spend` | Sanctum | Kurangi koin manual |
 | GET | `/user/profile` | Sanctum | Lihat profil user |
 | PUT | `/user/profile` | Sanctum | Edit profil user |
+| POST | `/user/change-email` | Sanctum | Ganti email |
+| POST | `/user/change-password` | Sanctum | Ganti password |
+| POST | `/user/settings` | Sanctum | Update settings |
+| GET | `/streak` | Sanctum | Cek streak & rest day quota |
 
 ---
 
-## 4. Analisis Fitur & Arsitektur
+## 4. Best Practice untuk Flutter
 
-### 4.1 Autentikasi (Sanctum Token)
-Register, Login, Logout — via token Sanctum. Token diterbitkan saat register/login, dihapus saat logout.
+### 4.1 Autentikasi — Simpan Token dengan Aman
 
-### 4.2 Task Management (CRUD + Soft Delete)
-Buat, lihat, edit, hapus task. Masing-masing task punya `coin_reward` (default 10), `task_type`, dan `is_routine`.
+```dart
+// flutter_secure_storage — jangan pakai SharedPreferences untuk token!
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-### 4.3 Daily Check-in & Gamification (`POST /tasks/{id}/check`)
-Complete task dengan 2 jenis reward:
-- **Puzzle source**: +25 coin + 1 puzzle piece (max 6/hari). Jika 6 terkumpul: +100 bonus coin + streak naik.
-- **Cart source**: + `coin_reward` (default 10).
-- Dicatat via `CoinHistories` (polymorphic).
+class AuthService {
+  final _storage = FlutterSecureStorage();
+  final _http = Dio(BaseOptions(baseUrl: 'https://unaisah-digitallab.my.id/api'));
 
-### 4.4 Puzzle System (`PuzzlePieces`)
-6 potongan puzzle per hari. Streak bertambah jika puzzle penuh (6/6).
+  Future<void> login(String email, String password) async {
+    final response = await _http.post('/login', data: {
+      'email': email,
+      'password': password,
+    });
 
-### 4.5 Streak & Rest Day
-- `current_streak` di-reset ke 0 jika kemarin puzzle tidak penuh (kecuali rest day).
-- Quota rest day: 2 per user.
+    final token = response.data['access_token'];
+    await _storage.write(key: 'auth_token', value: token);
+  }
 
-### 4.6 Mood Tracking (`POST /daily-record/mood`)
-Catat mood harian: `good` / `neutral` / `bad`.
+  Future<String?> getToken() => _storage.read(key: 'auth_token');
 
-### 4.7 Entertainment System
-- Lihat daftar apps (6 apps: Spotify, Netflix, YouTube, Mobile Legends, TikTok, Instagram).
-- **Purchase**: Harga inflasi 1.5x per pembelian di hari yang sama. Koin dipotong, session dibuat (`started_at` + `expired_at`).
-- **Complete Session**: Jika telat → denda 5 coin/menit, dicatat di `Punishments`.
+  Future<void> logout() async {
+    final token = await getToken();
+    await _http.post('/logout', options: Options(headers: {
+      'Authorization': 'Bearer $token',
+    }));
+    await _storage.delete(key: 'auth_token');
+  }
+}
+```
 
-### 4.8 Coin History (`GET /coin-histori`)
-Riwayat transaksi koin (reward/expense/punishment) dengan polymorphic source.
+### 4.2 Dio Interceptor — Suntik Token Otomatis
 
-### 4.9 User Profile
-Lihat & edit profil (name, email, username, birthday, gender — age computed dari birthday).
+```dart
+class AuthInterceptor extends Interceptor {
+  final FlutterSecureStorage storage;
 
-### 4.10 Arsitektur Database
-- **9 tabel utama**: `users`, `tasks`, `daily_records`, `daily_task_items`, `puzzle_pieces`, `apps`, `entertainment_logs`, `punishments`, `coin_histories`.
-- **Polymorphic `CoinHistories`**: via `morphs('source')` — mencatat reward/expense dari 3 sumber: `DailyTaskItem`, `EntertainmentLog`, `Punishment`.
-- **Per-day tracking**: `DailyRecord` (1/user/hari) → `DailyTaskItem` (many, link tasks) → `PuzzlePieces` (max 6/hari).
-- **Soft deletes** di `tasks`.
-- **Sanctum** `personal_access_tokens` untuk token auth.
+  AuthInterceptor(this.storage);
 
-### 4.11 Teknis
-- Middleware `auth:sanctum` di 15 dari 18 endpoint.
-- Form Request validation, API Resources, soft deletes.
-- 18 endpoint API siap pakai.
-- **Seeder**: 6 apps hiburan + 1 test user.
-- **Catatan**: Saat ini hanya backend API. Belum ada frontend/view yang mengonsumsi API.
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+    final token = await storage.read(key: 'auth_token');
+    if (token != null) {
+      options.headers['Authorization'] = 'Bearer $token';
+    }
+    handler.next(options);
+  }
+
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
+    if (err.response?.statusCode == 401) {
+      // Token expired — redirect ke login
+    }
+    handler.next(err);
+  }
+}
+```
+
+### 4.3 Model — Parsing JSON dengan `fromJson`/`toJson`
+
+```dart
+class Task {
+  final int id;
+  final String title;
+  final String? description;
+  final int coinReward;
+  final String? taskType;
+  final bool isRoutine;
+  final bool isChecked;
+  final bool isCompletedToday;
+
+  Task({
+    required this.id,
+    required this.title,
+    this.description,
+    required this.coinReward,
+    this.taskType,
+    required this.isRoutine,
+    required this.isChecked,
+    required this.isCompletedToday,
+  });
+
+  factory Task.fromJson(Map<String, dynamic> json) => Task(
+    id: json['id'],
+    title: json['title'],
+    description: json['description'],
+    coinReward: json['coin_reward'],
+    taskType: json['task_type'],
+    isRoutine: json['is_routine'],
+    isChecked: json['is_checked'],
+    isCompletedToday: json['is_completed_today'] ?? false,
+  );
+
+  Map<String, dynamic> toJson() => {
+    'title': title,
+    'description': description,
+    'coin_reward': coinReward,
+    'task_type': taskType,
+    'is_routine': isRoutine,
+    'is_checked': isChecked,
+  };
+}
+```
+
+### 4.4 Repository Pattern — Pisahkan Logika Bisnis
+
+```dart
+class TaskRepository {
+  final Dio _http;
+
+  TaskRepository(this._http);
+
+  Future<List<Task>> getTasks() async {
+    final response = await _http.get('/tasks');
+    return (response.data['data'] as List)
+        .map((json) => Task.fromJson(json))
+        .toList();
+  }
+
+  Future<Task> createTask(Task task) async {
+    final response = await _http.post('/tasks', data: task.toJson());
+    return Task.fromJson(response.data['data']);
+  }
+
+  Future<Map<String, dynamic>> checkTask(int taskId, {String source = 'cart'}) async {
+    final response = await _http.post('/tasks/$taskId/check', data: {
+      'source': source,
+    });
+    return response.data['data'];
+  }
+}
+```
+
+### 4.5 State Management — Gunakan Provider / Riverpod / Bloc
+
+```dart
+// Contoh dengan Riverpod
+@riverpod
+class TaskList extends _$TaskList {
+  @override
+  Future<List<Task>> build() async {
+    final repo = ref.watch(taskRepositoryProvider);
+    return repo.getTasks();
+  }
+
+  Future<void> checkTask(int taskId, {String source = 'cart'}) async {
+    final repo = ref.read(taskRepositoryProvider);
+    await repo.checkTask(taskId, source: source);
+    ref.invalidateSelf(); // reload list
+  }
+}
+```
+
+### 4.6 Error Handling — Tangani Semua Kemungkinan
+
+```dart
+class ApiResponse<T> {
+  final bool success;
+  final T? data;
+  final String? message;
+
+  ApiResponse({required this.success, this.data, this.message});
+
+  static Future<ApiResponse<T>> guard<T>(Future<T> Function() fn) async {
+    try {
+      final data = await fn();
+      return ApiResponse(success: true, data: data);
+    } on DioException catch (e) {
+      return ApiResponse(
+        success: false,
+        message: e.response?.data['message'] ?? 'Terjadi kesalahan',
+      );
+    }
+  }
+}
+```
+
+### 4.7 Upload Avatar
+
+```dart
+Future<void> updateProfileWithAvatar(File? imageFile) async {
+  final formData = FormData();
+  if (imageFile != null) {
+    formData.files.add(MapEntry(
+      'avatar',
+      await MultipartFile.fromFile(imageFile.path, filename: 'avatar.jpg'),
+    ));
+  }
+  formData.fields.addAll({
+    'name': 'John Updated',
+    'birthday': '2000-01-15',
+  }.entries);
+
+  final response = await _http.put('/user/profile', data: formData);
+}
+```
+
+### 4.8 Tips Penting
+
+| Area | Best Practice |
+|---|---|
+| **Token** | Simpan di `FlutterSecureStorage`, jangan di `SharedPreferences` |
+| **Header** | Gunakan Dio interceptor untuk inject token otomatis |
+| **Pagination** | Endpoint `session/history` support pagination — gunakan `page` parameter |
+| **Date** | Backend pakai `YYYY-MM-DD` untuk tanggal, `YYYY-MM-DD HH:mm:ss` untuk datetime |
+| **Error** | Semua error response punya field `message` — tampilkan ke user |
+| **Source** | `source: "cart"` untuk todo list, `source: "puzzle"` untuk puzzle page |
+| **Avatar** | Kirim sebagai `multipart/form-data`, bukan JSON |
+| **Settings** | Field `settings` di user adalah JSON bebas — simpan preferensi theme, notifikasi, dll |
+
+---

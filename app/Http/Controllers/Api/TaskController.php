@@ -120,7 +120,7 @@ class TaskController extends Controller
 
         if ($source === 'puzzle') {
             if ($currentPieces < 6) {
-                $rewardAmount = 25;
+                $rewardAmount = 10;
 
                 PuzzlePieces::create([
                     'daily_record_id' => $dailyRecord->id,
@@ -140,7 +140,7 @@ class TaskController extends Controller
                 }
             }
         } else {
-            $rewardAmount = $task->coin_reward;
+            $rewardAmount = 10;
             $task->update(['is_checked' => true]);
         }
 
