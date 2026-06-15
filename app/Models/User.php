@@ -40,7 +40,6 @@ class User extends Authenticatable
     public function entertainmentLogs() { return $this->hasMany(EntertainmentLog::class); }
     public function punishments() { return $this->hasMany(Punishment::class); }
     public function coinHistories() { return $this->hasMany(CoinHistories::class); }
-    public function notes() { return $this->hasMany(Note::class); }
 
     /**
      * Get the attributes that should be cast.

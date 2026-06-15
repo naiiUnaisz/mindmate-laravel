@@ -18,9 +18,6 @@ class TaskResource extends JsonResource
             'task_type' => $this->task_type,
             'is_routine' => $this->is_routine,
             'is_checked' => $this->is_checked,
-            'is_completed_today' => $this->whenLoaded('dailyTaskItems', function () {
-                return $this->dailyTaskItems->first()?->is_completed ?? false;
-            }, false),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

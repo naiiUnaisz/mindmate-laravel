@@ -4,7 +4,6 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DailyRecordController;
 use App\Http\Controllers\Api\EntertainmentController;
 use App\Http\Controllers\Api\HistoriController;
-use App\Http\Controllers\Api\NoteController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
@@ -57,6 +56,4 @@ Route::middleware('auth:sanctum')->group(function() {
 
     Route::get('/puzzles', [DailyRecordController::class, 'puzzles']);
     Route::post('/puzzles/unlock', [DailyRecordController::class, 'unlockPuzzle']);
-
-    Route::apiResource('/notes', NoteController::class);
 });

@@ -17,10 +17,7 @@ use Illuminate\Support\Carbon;
 class TaskController extends Controller
 {
     public function index(Request $request) {
-        $tasks = $request->user()->tasks()
-            ->with(['dailyTaskItems' => fn($q) => $q->whereHas('dailyRecord', fn($q) => $q->where('date', today()))])
-            ->latest()
-            ->get();
+        $tasks = $request->user()->tasks()->latest()->get();
         return response()->json([
             'success' => true,
             'data' => TaskResource::collection($tasks)
