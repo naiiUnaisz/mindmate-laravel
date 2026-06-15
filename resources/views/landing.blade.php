@@ -320,8 +320,8 @@
 
 <div id="downloadModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[999] hidden">
     <div class="bg-white rounded-3xl p-8 max-w-sm mx-4 shadow-2xl text-center">
-        <div class="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full bg-yellow-100">
-            <i class="fa-solid fa-triangle-exclamation text-3xl text-yellow-500"></i>
+        <div class="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full bg-purple-100">
+            <i class="fa-solid fa-download text-3xl text-[#6C5CE7]"></i>
         </div>
         <h3 class="text-xl font-bold text-slate-800 mb-2">Download MindMate</h3>
         <p class="text-sm text-slate-500 mb-6 leading-relaxed">
