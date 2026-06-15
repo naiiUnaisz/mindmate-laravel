@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindmate</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.png') }}">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght=300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+
+<body class="bg-[#F9F9FF] text-slate-800 antialiased overflow-x-hidden">
+
+    <header class="sticky top-0 z-50 w-full bg-[#F9F9FF]/95  border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between relative">
+            
+
+            <div class="flex items-center gap-3 z-50">
+                <div class="w-10 h-10 flex items-center justify-center rounded-xl overflow-hidden">
+                    <img src="{{ asset('images/Screenshot_2026-05-28_at_11.14.51-removebg-preview.png') }}" alt="Logo" class="w-full h-full object-cover">
+                </div>
+                <span class="font-bold tracking-wide text-xl text-[#2D2D2D]">Mindmate</span>
+            </div>
+
+            <input type="checkbox" id="menu-toggle" class="peer hidden">
+
+            <nav class="absolute top-full left-0 w-full bg-white shadow-xl md:shadow-none p-6 md:p-0 flex flex-col md:flex-row items-center gap-6 md:gap-10 text-sm font-medium text-black max-h-0 md:max-h-none overflow-hidden peer-checked:max-h-[400px] transition-all duration-300 ease-in-out box-border z-40 md:static md:w-auto md:bg-transparent">
+                <a href="#feature" class="text-[#6C5CE7] md:pb-1 w-full md:w-auto text-center font-semibold">Feature</a>
+                <a href="#how-it-works" class="hover:text-[#6C5CE7] transition md:pb-1 w-full md:w-auto text-center">How It Works</a>
+                <a href="#preview" class="hover:text-[#6C5CE7] transition md:pb-1 w-full md:w-auto text-center">Preview</a>
+
+                <div class="flex flex-col gap-3 w-full mt-2 pt-4 border-t border-slate-100 md:hidden">
+                    <a href="#" class="text-[#6C5CE7] hover:text-[#5b4cc4] rounded-xl transition py-2.5 px-5 text-center bg-purple-50 font-semibold">Sign in</a>
+                    <a href="#" class="bg-[#6C5CE7] text-white py-2.5 px-5 rounded-xl hover:bg-[#5b4cc4] transition text-center font-semibold shadow-sm">Download</a>
+                </div>
+            </nav>
+
+            <div class="hidden md:flex items-center gap-4 text-sm font-medium">
+                <a href="#" class="text-[#6C5CE7] hover:text-[#5b4cc4] rounded-xl transition py-2.5 px-5 shadow-sm shadow-purple-200">Sign in</a>
+                <a href="#" class="bg-[#6C5CE7] text-white py-2.5 px-5 rounded-xl hover:bg-[#5b4cc4] transition shadow-sm shadow-purple-200">Download</a>
+            </div>
+
+            <label for="menu-toggle" class="md:hidden flex flex-col gap-1.5 cursor-pointer p-2 text-slate-800 z-50 select-none">
+                <span class="w-6 h-0.5 bg-slate-800 transition-all duration-300"></span>
+                <span class="w-6 h-0.5 bg-slate-800 transition-all duration-300"></span>
+                <span class="w-6 h-0.5 bg-slate-800 transition-all duration-300"></span>
+            </label>
+
+        </div>
+    </header>
+
+    <section class="max-w-7xl mx-auto px-6 pt-8 md:pt-16 pb-16 md:pb-24 flex flex-col md:flex-row items-center gap-10 w-full box-border relative">
+
+        
+        <div class="w-full md:w-1/2 text-center md:text-left order-1 relative z-10">
+            <h1 class="text-3xl sm:text-4xl md:text-4xl font-bold text-[#111111] leading-tight mb-4">
+                Turn Your Tasks Into <br class="hidden sm:block">
+                <span class="text-black">Progress You Can See</span>
+            </h1>
+            <p class="text-black text-sm sm:text-base mb-6 max-w-sm sm:max-w-md mx-auto md:mx-0 leading-relaxed">
+                Complete your daily tasks and stay <br> consistent so you can see how far <br> you have come.
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 w-full max-w-sm mx-auto md:mx-0">
+                <a href="#" class="w-full sm:w-auto px-6 py-3 text-white bg-[#6C5CE7] rounded-xl font-medium text-center hover:bg-[#5b4cc4] transition shadow-md shadow-purple-200 flex items-center justify-center gap-1">
+                    Download <i class="fa-solid fa-chevron-right text-xs ml-1"></i>
+                </a>
+                <a href="#" class="w-full sm:w-auto px-6 py-3 text-[#6C5CE7] border border-[#6C5CE7]/30 bg-white rounded-xl font-medium text-center hover:bg-slate-50 transition">
+                    Sign in
+                </a>
+            </div>
+        </div>
+
+        <div class="w-full md:w-1/2 flex justify-center items-center order-2 px-4 mt-4 md:mt-0 relative z-10">
+            <img src="{{ asset('images/Screenshot_2026-05-28_at_11.02.36-removebg-preview.png') }}"
+                alt="Hero Image"
+                class="w-full max-w-[250px] sm:max-w-[300px] md:max-w-full h-auto object-contain">
+        </div>
+    </section>
+
+    <section id="feature" class="max-w-7xl mx-auto px-6 mb-24">
+        <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+
+            <div class="flex items-start gap-4 p-4 rounded-2xl cursor-pointer transition-all duration-300 ease-in-out hover:scale-105 hover:-translate-y-1 hover:shadow-xl hover:bg-slate-50/50">
+                <div class="w-14 h-14 shrink-0 rounded-full flex items-center justify-center">
+                    <img src="{{ asset('images/fuzzle.png') }}" alt="Puzzle Progress" class="w-full h-full object-contain">
+                </div>
+                <div class="space-y-1">
+                    <h4 class="font-bold text-base text-slate-800 tracking-tight">Puzzle Progress</h4>
+                    <p class="text-xs text-slate-500 leading-relaxed max-w-[180px]">
+                        Complete tasks and collect puzzle pieces every day.
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-4 p-4 rounded-2xl cursor-pointer transition-all duration-300 ease-in-out hover:scale-105 hover:-translate-y-1 hover:shadow-xl hover:bg-slate-50/50">
+                <div class="w-14 h-14 shrink-0 rounded-full flex items-center justify-center">
+                    <img src="{{ asset('images/senyum.png') }}" alt="Mood Tracking" class="w-full h-full object-contain">
+                </div>
+                <div class="space-y-1">
+                    <h4 class="font-bold text-base text-slate-800 tracking-tight">Mood Tracking</h4>
+                    <p class="text-xs text-slate-500 leading-relaxed max-w-[180px]">
+                        Track your mood in seconds with simple emoji.
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-4 p-4 rounded-2xl cursor-pointer transition-all duration-300 ease-in-out hover:scale-105 hover:-translate-y-1 hover:shadow-xl hover:bg-slate-50/50">
+                <div class="w-14 h-14 shrink-0 rounded-full flex items-center justify-center">
+                    <img src="{{ asset('images/gatay.png') }}" alt="Weekly Insights" class="w-full h-full object-contain">
+                </div>
+                <div class="space-y-1">
+                    <h4 class="font-bold text-base text-slate-800 tracking-tight">Weekly Insights</h4>
+                    <p class="text-xs text-slate-500 leading-relaxed max-w-[180px]">
+                        See your mood and productivity patterns over time.
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-4 p-4 rounded-2xl cursor-pointer transition-all duration-300 ease-in-out hover:scale-105 hover:-translate-y-1 hover:shadow-xl hover:bg-slate-50/50">
+                <div class="w-14 h-14 shrink-0 rounded-full flex items-center justify-center">
+                    <img src="{{ asset('images/api.png') }}" alt="Streak & Rewards" class="w-full h-full object-contain">
+                </div>
+                <div class="space-y-1">
+                    <h4 class="font-bold text-base text-slate-800 tracking-tight">Streak & Rewards</h4>
+                    <p class="text-xs text-slate-500 leading-relaxed max-w-[180px]">
+                        Build streaks, unlock badges, and stay motivated!
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+    <section id="how-it-works" class="max-w-7xl mx-auto px-6 text-center mb-24">
+        <span class="bg-purple-100 text-[#6C5CE7] text-xs font-semibold px-4 py-1.5 rounded-full uppercase tracking-wider">How It Works</span>
+        <h2 class="text-2xl md:text-3xl font-bold text-[#2D2D2D] mt-4 mb-16">Simple steps for a better you</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12 relative max-w-4xl mx-auto">
+            <div class="flex flex-col items-center">
+                <div class="w-28 h-28 rounded-full flex items-center justify-center mx-auto mb-4 overflow-hidden p-3">
+                    <img src="{{ asset('images/buku.png') }}" alt="" class="w-full h-full object-contain">
+                </div>
+                <h3 class="font-semibold text-slate-800 mb-2 text-sm"><span class="text-purple-600 font-bold mr-1">1</span> Plan Your Day</h3>
+                <p class="text-xs text-black max-w-xs leading-relaxed">Add your tasks for the day <br> and get ready to achieve <br>your goals.</p>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="w-28 h-28 rounded-full flex items-center justify-center mx-auto mb-4 overflow-hidden p-3">
+                    <img src="{{ asset('images/pager.png') }}" alt="" class="w-full h-full object-contain">
+                </div>
+                <h3 class="font-semibold text-slate-800 mb-2 text-sm"><span class="text-yellow-500 font-bold mr-1">2</span> Complete & Collect</h3>
+                <p class="text-xs text-black max-w-xs leading-relaxed">Complete your tasks <br>and collect puzzle pieces <br> as a reward.</p>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="w-28 h-28 rounded-full flex items-center justify-center mx-auto mb-4 overflow-hidden p-3">
+                    <img src="{{ asset('images/duit.png') }}" alt="" class="w-full h-full object-contain">
+                </div>
+                <h3 class="font-semibold text-slate-800 mb-2 text-sm"><span class="text-red-500 font-bold mr-1">3</span> Track & Improve</h3>
+                <p class="text-xs  text-black max-w-xs leading-relaxed">Track your mood, see <br> insights, and become a <br>better version of yourself.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="preview" class="max-w-7xl mx-auto px-6 text-center mb-24">
+        <span class="bg-purple-100 text-[#6C5CE7] text-xs font-semibold px-4 py-1.5 rounded-full uppercase tracking-wider">App Preview</span>
+        <h2 class="text-2xl md:text-3xl font-bold text-[#2D2D2D] mt-4 mb-12">Designed to make productivity enjoyable</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+            <div class="bg-[#ECEBFF] rounded-3xl p-6 flex flex-col justify-between min-h-[380px] md:h-[450px] overflow-hidden shadow-sm transition-all duration-300 ease-in-out hover:scale-105 hover:-translate-y-2 hover:shadow-2xl hover:rotate-1 cursor-pointer">
+                <div>
+                    <h3 class="font-bold text-lg text-slate-800 mb-2">Daily Puzzle</h3>
+                    <p class="text-xs text-black leading-relaxed max-w-[200px]">Complete tasks to <br> reveal your beautiful <br> puzzle piece by piece.</p>
+                </div>
+                <div class="mt-6 bg-white rounded-2xl p-4 shadow-sm translate-y-4">
+                    <img src="{{ asset('images/nyenye.png') }}" alt="Puzzle UI" class="w-full h-auto rounded-xl">
+                </div>
+            </div>
+            <div class="bg-[#FFFCE4] rounded-3xl p-6 flex flex-col justify-between min-h-[380px] md:h-[450px] overflow-hidden shadow-sm transition-all duration-300 ease-in-out hover:scale-105 hover:-translate-y-2 hover:shadow-2xl hover:rotate-1 cursor-pointer">
+                <div>
+                    <h3 class="font-bold text-lg text-slate-800 mb-2">Weekly History</h3>
+                    <p class="text-xs text-black leading-relaxed max-w-[200px]">See your mood and <br>task completion at a <br> glance.</p>
+                </div>
+                <div class="mt-6 bg-white rounded-2xl p-4 shadow-sm translate-y-4">
+                    <img src="{{ asset('images/mood.png') }}" alt="History UI" class="w-full h-auto rounded-xl">
+                </div>
+            </div>
+            <div class="bg-[#FFEBEB] rounded-3xl p-6 flex flex-col justify-between min-h-[380px] md:h-[450px] overflow-hidden shadow-sm transition-all duration-300 ease-in-out hover:scale-105 hover:-translate-y-2 hover:shadow-2xl hover:rotate-1 cursor-pointer">
+                <div>
+                    <h3 class="font-bold text-lg text-slate-800 mb-2">Coins & Rewards</h3>
+                    <p class="text-xs text-black leading-relaxed max-w-[200px]">Get insights about <br> your habits and mood <br> patterns.</p>
+                </div>
+                <div class="mt-6 flex gap-2 translate-y-4">
+                    <div class="bg-white rounded-2xl shadow-sm w-1/2">
+                        <img src="{{ asset('images/detail.png') }}" alt="Coins UI" class="w-full h-auto rounded-lg">
+                    </div>
+                    <div class="bg-white rounded-2xl p-3 shadow-sm w-1/2">
+                        <img src="{{ asset('images/relax.png') }}" alt="Store UI" class="w-full h-auto rounded-lg">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="max-w-7xl mx-auto px-6 mb-24">
+        <h2 class="text-2xl md:text-3xl font-bold text-center text-[#2D2D2D] mb-12">Review from User</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-100 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-12 h-12 bg-slate-200 rounded-full overflow-hidden shrink-0">
+                            <img src="https://i.pravatar.cc/100?img=11" alt="Evan" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-base text-slate-800 leading-tight">Evan</h4>
+                            <span class="text-xs text-black">Student</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-0.5 mb-4 text-yellow-400 text-base">⭐⭐⭐⭐⭐</div>
+                    <p class="text-sm font-medium text-black leading-relaxed">"This app somehow makes productivity feel less stressful 😂 I keep opening it just to check my streak and end up finishing my tasks too."</p>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-100 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-12 h-12 bg-slate-200 rounded-full overflow-hidden shrink-0">
+                            <img src="https://i.pravatar.cc/100?img=26" alt="Karinn" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-base text-slate-800 leading-tight">Karinn</h4>
+                            <span class="text-xs text-black">Influencer</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-0.5 mb-4 text-yellow-400 text-base">⭐⭐⭐⭐⭐</div>
+                    <p class="text-sm font-medium text-black leading-relaxed">"The design is actually sooooo pretty. The little mascot and reward system make the app feel alive instead of boring ✨"</p>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-100 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-12 h-12 bg-slate-200 rounded-full overflow-hidden shrink-0">
+                            <img src="https://i.pravatar.cc/100?img=33" alt="Nicho" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-base text-slate-800 leading-tight">Nicho</h4>
+                            <span class="text-xs text-black">Dancer</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-0.5 mb-4 text-yellow-400 text-base">⭐⭐⭐⭐⭐</div>
+                    <p class="text-sm font-medium text-black leading-relaxed">"I've tried so many productivity apps before, but this is the first one that didn't make me feel pressured all the time 🌙"</p>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-100 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-12 h-12 bg-slate-200 rounded-full overflow-hidden shrink-0">
+                            <img src="https://i.pravatar.cc/100?img=47" alt="Reiy" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-base text-slate-800 leading-tight">Reiy</h4>
+                            <span class="text-xs text-black">Freelancer Designer</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-0.5 mb-4 text-yellow-400 text-base">⭐⭐⭐⭐⭐</div>
+                    <p class="text-sm font-medium text-black leading-relaxed">"Really cute and motivating app. I just wish there were more customization options for the themes and mascot 👀"</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-[#6a5fac] text-white pt-12 pb-6 px-6 md:px-20 text-sm">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start gap-12 border-b border-white/10 pb-8">
+            <div class="max-w-xs">
+                <div class="flex items-center gap-2 mb-4">
+                    <img src="{{ asset('images/footerr.png') }}" alt="Mindmate" class="h-6">
+                    <h2 class="text-lg font-bold tracking-wide">Mindmate</h2>
+                </div>
+                <p class="text-white leading-relaxed">Productivity and self-care app that helps users <br> stay focused, organized, and balanced through <br> daily tasks, puzzle rewards, mood tracking, and <br>coin-based entertainment features.</p>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-12 md:gap-20 w-full md:w-auto">
+                <div>
+                    <h3 class="font-bold tracking-wide mb-4 md:mb-6 text-white text-base">Application</h3>
+                    <ul class="space-y-3 text-white">
+                        <li><a href="#" class="hover:underline hover:text-white transition">Features</a></li>
+                        <li><a href="#" class="hover:underline hover:text-white transition">Preview</a></li>
+                        <li><a href="#" class="hover:underline hover:text-white transition">About Mindmate</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold tracking-wide mb-4 md:mb-6 text-white text-base">Resources</h3>
+                    <ul class="space-y-3 text-white">
+                        <li><a href="#" class="hover:underline hover:text-white transition">Contact Us</a></li>
+                        <li><a href="#" class="hover:underline hover:text-white transition">Press Kit</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold tracking-wide mb-4 md:mb-6 text-white text-base">Download</h3>
+                    <ul class="space-y-3 text-white">
+                        <li><a href="#" class="hover:underline hover:text-white transition">Web App</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </footer>
+
+</body>
+
+</html>
