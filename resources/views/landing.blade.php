@@ -52,7 +52,7 @@
             </nav>
 
             <div class="hidden md:flex items-center gap-4 text-sm font-medium">
-                <a href="#" class="bg-[#6C5CE7] text-white py-2.5 px-5 rounded-xl hover:bg-[#5b4cc4] transition shadow-sm shadow-purple-200">Download</a>
+                <a href="javascript:void(0)" onclick="showDownloadModal()" class="bg-[#6C5CE7] text-white py-2.5 px-5 rounded-xl hover:bg-[#5b4cc4] transition shadow-sm shadow-purple-200">Download</a>
 
             </div>
 
@@ -77,7 +77,7 @@
                 Complete your daily tasks and stay <br> consistent so you can see how far <br> you have come.
             </p>
 
-            <button class="bg-[#6C5CE7] hover:bg-[#5b4cc4] text-white font-medium px-7 py-3.5 rounded-2xl shadow-lg shadow-[#6C5CE7]/20 transition-all flex items-center gap-3 text-base group">
+            <button onclick="showDownloadModal()" class="bg-[#6C5CE7] hover:bg-[#5b4cc4] text-white font-medium px-7 py-3.5 rounded-2xl shadow-lg shadow-[#6C5CE7]/20 transition-all flex items-center gap-3 text-base group">
                 <span>Download</span>
 
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 transition-transform duration-200 group-hover:translate-y-0.5">
@@ -310,13 +310,38 @@
                 <div>
                     <h3 class="font-bold tracking-wide mb-4 md:mb-6 text-white text-base">Download</h3>
                     <ul class="space-y-3 text-white">
-                        <li><a href="#" class="hover:underline hover:text-white transition">Web App</a></li>
+                        <li><a href="javascript:void(0)" onclick="showDownloadModal()" class="hover:underline hover:text-white transition">Download APK</a></li>
                     </ul>
                 </div>
             </div>
         </div>
 
     </footer>
+
+<div id="downloadModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[999] hidden">
+    <div class="bg-white rounded-3xl p-8 max-w-sm mx-4 shadow-2xl text-center">
+        <div class="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full bg-yellow-100">
+            <i class="fa-solid fa-triangle-exclamation text-3xl text-yellow-500"></i>
+        </div>
+        <h3 class="text-xl font-bold text-slate-800 mb-2">Download MindMate</h3>
+        <p class="text-sm text-slate-500 mb-6 leading-relaxed">
+            This app is not available on the Google Play Store. You are about to download an APK file from an unofficial source. Make sure to enable <strong>"Install from unknown sources"</strong> in your device settings.
+        </p>
+        <div class="flex gap-3">
+            <button onclick="closeDownloadModal()" class="flex-1 py-3 border border-slate-200 rounded-xl text-slate-600 font-medium hover:bg-slate-50 transition">Cancel</button>
+            <a href="{{ asset('apk-mindmate/mindmate.apk') }}" download="MindMate.apk" onclick="closeDownloadModal()" class="flex-1 py-3 bg-[#6C5CE7] text-white rounded-xl font-medium hover:bg-[#5b4cc4] transition text-center">Download</a>
+        </div>
+    </div>
+</div>
+
+<script>
+function showDownloadModal() {
+    document.getElementById('downloadModal').classList.remove('hidden');
+}
+function closeDownloadModal() {
+    document.getElementById('downloadModal').classList.add('hidden');
+}
+</script>
 
 </body>
 
